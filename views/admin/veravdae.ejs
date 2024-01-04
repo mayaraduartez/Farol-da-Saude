@@ -1,0 +1,100 @@
+<%-include('./cabecalho.ejs')%>
+ <!-- bloco principal -->
+ <main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Avaliação</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/principaladm">Principal</a></li>
+          <li class="breadcrumb-item"><a href="/alunos"></a>Alunos</li>
+          <li class="breadcrumb-item">Ver Perfil</li>
+          <li class="breadcrumb-item active">Ver Avaliação</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+        
+    <section class="section dashboard">
+        <div class="row">
+          <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Avaliação Depressão, Ansiedade e Estresse</h5>
+  
+                <!-- List group with active and disabled items -->
+                <ul class="list-group list-group-flush">
+                  <li class="list-group-item">Aluno avaliado: <strong><%= avaliacao.Usuario.nome %></strong></li>
+                  <li class="list-group-item">Data que foi feita a Avaliação: <strong><%= avaliacao.data_avaliacao%></strong></li>
+                  <li class="list-group-item">Nível de Depressão: <strong><%= avaliacao.depressaoScore %></strong></li>
+                  <li class="list-group-item">Nível de Ansiedade: <strong><%= avaliacao.ansiedadeScore %></strong></li>
+                  <li class="list-group-item">Nível de Estresse: <strong><%= avaliacao.estresseScore %></strong></li>
+                  
+                  
+                </ul><!-- End Clean list group -->
+                
+             <div class="resultado"> 
+              
+            <div class="resultado-bonecoA"  data-depressao-score="<%= avaliacao.depressaoScore %>">   
+            <h5>Depressão:</h5>
+              <div class="boneco">
+                <div id="idCabeçaDepressao" class="cabeca"></div>
+                <div style="display:flex;">                  
+                    <div id="idCorpoDepressao"  class="corpo"></div>
+
+                </div>
+                <div style="display:flex; gap:15px;">
+                <div id="idPernasDepressao" class="pernas"></div>
+            </div>
+            </div>
+            <h5><%=avaliacao.depressao %></h5>
+            </div> 
+            
+
+            <div class="resultado-bonecoB" data-ansiedade-score="<%= avaliacao.ansiedadeScore %>">   
+                <h5>Ansiedade:</h5>
+                  <div class="boneco">
+                    <div id="idCabeçaAnsiedade" class="cabeca"></div>
+                    <div style="display:flex;">
+                        
+                        <div id="idCorpoAnsiedade" class="corpo" ></div>
+                    </div>
+                    <div style="display:flex; gap:15px;">
+                    <div id="idPernasAnsiedade"class="pernas"></div>
+                   
+                </div>
+                </div>
+                <h5><%=avaliacao.ansiedade %></h5>
+
+                </div> 
+
+            <div class="resultado-bonecoC" data-estresse-score="<%= avaliacao.estresseScore %>">   
+                <h5>Estresse:</h5>
+                  <div class="boneco">
+                    <div id="idCabeçaEstresse" class="cabeca"></div>
+                    <div style="display:flex;">
+                        
+                        <div id="idCorpoEstresse" class="corpo"></div>
+                       
+            
+                   
+                    </div>
+                    <div style="display:flex; gap:15px;">
+                    <div id="idPernasEstresse" class="pernas"></div>
+                   
+                </div>
+                </div>
+                <h5><%=avaliacao.estresse %></h5>
+                </div> 
+            </div>
+        </div>   
+  
+          
+        </div>
+
+
+  </main><!-- End #main -->
+
+<script src="/js/graficobonecos.js"></script>
+
+
+
+<%-include('./rodape.ejs')%>

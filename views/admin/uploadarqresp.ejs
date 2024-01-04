@@ -1,0 +1,95 @@
+<%-include('./cabecalho.ejs')%>
+<!-- bloco principal -->
+<main id="main" class="main">
+  <div class="pagetitle">
+    <h1>Fazer upload de respostas</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/principaladm">Principal</a></li>
+        <li class="breadcrumb-item active">Avaliação</li>
+        <li class="breadcrumb-item active">Fazer upload de respostas</li>
+      </ol>
+    </nav>
+  </div>
+  <!-- End Page Title -->
+
+  <section class="section dashboard">
+    <div
+      class="row"
+      style="
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+      "
+    >
+      <!-- Left side columns -->
+
+      <div class="card info-card customers-card">
+        <form method="post" enctype="multipart/form-data">
+          <div
+            class="row mb-3"
+            style="
+              display: flex;
+              flex-direction: column;
+              justify-content: center;
+              align-items: center;
+            "
+          >
+            <label for="inputNumber" class="col-sm-2 col-form-label"
+              >File Upload</label
+            >
+            <div class="col-sm-10">
+              <input
+                class="form-control"
+                type="file"
+                name="arquivo"
+                id="formFile"
+                required
+              />
+            </div>
+          </div>
+          <div class="row mb-3">
+            <label class="col-sm-2 col-form-label"></label>
+            <div class="col-sm-10">
+              <button type="submit" class="btn btn-primary">
+                Salvar Arquivo
+              </button>
+            </div>
+          </div>
+        </form>
+        <div
+          class="mensagem"
+          style="color: rgb(40, 190, 10); text-align: center"
+        >
+          <% if(msg) {%> <%= msg %> <%}%>
+        </div>
+      </div>
+
+      <!-- Right side columns -->
+    </div>
+  </section>
+</main>
+<!-- End #main -->
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const inputFile = document.getElementById("formFile");
+
+    inputFile.addEventListener("change", function (event) {
+      const file = event.target.files[0];
+
+      if (file) {
+        if (file.type === "text/csv" || file.name.endsWith(".csv")) {
+          console.log("Arquivo CSV selecionado.");
+        } else {
+          alert("Por favor, selecione um arquivo CSV.");
+
+          inputFile.value = "";
+        }
+      }
+    });
+  });
+</script>
+
+<%-include('./rodape.ejs')%>

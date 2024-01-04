@@ -1,0 +1,29 @@
+{
+  "development": {
+    "username": "postgres",
+    "password": "postgres",
+    "database": "db_faroldasaude",
+    "host": "localhost",
+    "port": "5432",
+    "dialect": "postgres",
+    "dialectOptions":{
+      "useUTC":false,
+      "timezone":"-03:00"
+    },
+    "timezone":"-03:00"
+  },
+  "test": {
+    "username": "root",
+    "password": null,
+    "database": "database_test",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  },
+  "production": {
+    "username": "root",
+    "password": null,
+    "database": "database_production",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  }
+}

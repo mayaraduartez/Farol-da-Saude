@@ -1,0 +1,261 @@
+<%-include('./cabecalho.ejs')%>
+  <main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Profile</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/principaladm">Principal</a></li>
+          <li class="breadcrumb-item">Meu perfil</li>
+          
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section profile">
+      <div class="row">
+        <div class="col-xl-4">
+
+          <div class="card">
+            <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
+              <div class="profile_picture">
+                <% if (usuario.foto) { %>
+                  <img  src="img/<%= usuario.foto %>" />
+                <% } else { %>
+                  <img  alt="Profile" src="img/user.png" />
+                <% } %>
+              </div>
+              <h2><%= usuario.nome%></h2>
+              <h3>Administrador</h3>
+              
+            </div>
+          </div>
+
+        </div>
+
+        <div class="col-xl-8">
+
+          <div class="card">
+            <div class="card-body pt-3">
+              <!-- Bordered Tabs -->
+              <ul class="nav nav-tabs nav-tabs-bordered">
+
+                <li class="nav-item">
+                  <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#profile-overview">Resumo</button>
+                </li>
+
+                <li class="nav-item">
+                  <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-edit">Editar Perfil</button>
+                </li>
+
+                <li class="nav-item">
+                  <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-change-password">Senha</button>
+                </li>
+
+              </ul>
+              <div class="tab-content pt-2">
+
+                <div class="tab-pane fade show active profile-overview" id="profile-overview">
+                  
+                  <h5 class="card-title">Detalhes</h5>
+
+                  <div class="row">
+                    <div class="col-lg-3 col-md-4 label ">Nome</div>
+                    <div class="col-lg-9 col-md-8"><%= usuario.nome%> <%= usuario.sobrenome%></div>
+                  </div>
+
+                  
+                  <div class="row">
+                    <div class="col-lg-3 col-md-4 label">Data de Nascimento</div>
+                    <% if (!usuario.data_nascimento) { %>
+                    <div class="col-lg-9 col-md-8" style="color: red;">Atualize seu perfil! </div>
+                    <% } else { %>
+                    
+                      <div class="col-lg-9 col-md-8"><%= usuario.data_nascimento%></div>
+                      <% } %>
+                  </div>
+                  <div class="row">
+                    <div class="col-lg-3 col-md-4 label">Email</div>
+                    <div class="col-lg-9 col-md-8"><%= usuario.email%></div>
+                  </div>
+
+                </div>
+
+                <div class="tab-pane fade profile-edit pt-3" id="profile-edit">
+
+                  
+                  <form method="post" action="/salvarperfil" enctype="multipart/form-data" data-parsley-validate>
+                    <div class="row mb-3">
+                      <label for="profileImage" class="col-md-4 col-lg-3 col-form-label">Foto de perfil</label>
+                      <div class="col-md-8 col-lg-9">
+                        <div class="profile_picture">
+                        <% if (usuario.foto) { %>
+                          <img id="preview_img" src="img/<%= usuario.foto %>" />
+                        <% } else { %>
+                          <img id="preview_img" alt="Profile" src="img/user.png" />
+                        <% } %>
+                      </div>
+                      <div class="pt-2">
+                        <label for="fotoInput" class="btn btn-primary btn-sm" title="Trocar foto de perfil">
+                          <input type="file" id="fotoInput" name="foto" accept="image/*" style="display: none;">
+                          <i class="bi bi-upload"></i>
+                        </label>
+                        <div id="removeFoto" class="btn btn-danger btn-sm" title="Remover foto de perfil"><i class="bi bi-trash"></i></div>
+                        <input type="hidden" name="remover_foto" id="remover_foto" value="false">
+
+                      </div>
+                      
+                      </div>
+                    </div>
+
+                    <div class="row mb-3">
+                      <label for="fullName" class="col-md-4 col-lg-3 col-form-label">Nome</label>
+                      <div class="col-md-8 col-lg-9">
+                        <input name="name" type="text" class="form-control" value="<%= usuario.nome%>" required>
+                      </div>
+                    </div>
+
+
+                    <div class="row mb-3">
+                      <label for="fullName" class="col-md-4 col-lg-3 col-form-label">Data de Nascimento</label>
+                      <div class="col-md-8 col-lg-9">
+                        <input name="data_nascimento" type="date" class="form-control"  value="<%= usuario.data_nascimento%>" required>
+                      </div>
+                    </div>
+
+
+                    <div class="row mb-3">
+                      <label for="Email" class="col-md-4 col-lg-3 col-form-label">Email</label>
+                      <div class="col-md-8 col-lg-9">
+                        <input name="email" type="email" class="form-control"  value="<%= usuario.email%>" required>
+                      </div>
+                    </div>
+
+                    <div class="row mb-3">
+                      <label  class="col-md-4 col-lg-3 col-form-label">CPF</label>
+                      <div class="col-md-8 col-lg-9">
+                        <input name="cpf" type="number" class="form-control" value="<%= usuario.cpf%>" required>
+                      </div>
+                    </div>
+                    <div class="row mb-3">
+                      <label class="col-md-4 col-lg-3 col-form-label">Etnia</label>
+                      <div class="col-md-8 col-lg-9">
+                        <input name="etnia" type="text" class="form-control" value="<%= usuario.etnia%>" required>
+                      </div>
+                    </div>
+                    <div class="row mb-3">
+                      <label  class="col-md-4 col-lg-3 col-form-label">Sexo</label>
+                      <div class="col-md-8 col-lg-9">
+                        <input name="sexo" type="text" class="form-control" value="<%= usuario.sexo%>" required>
+                      </div>
+                    </div>
+
+                    
+
+                    <div class="text-center">
+                      <button type="submit" class="btn btn-primary">Salvar Edições</button>
+                    </div>
+                  </form>
+
+                </div>
+                
+
+                <div class="tab-pane fade pt-3" id="profile-change-password">
+                  <!-- Change Password Form -->
+                  <form method="post"  id="form-nova-senha">
+
+                    <div class="row mb-3">
+                      <label for="currentPassword" class="col-md-4 col-lg-3 col-form-label">Senha atual</label>
+                      <div class="col-md-8 col-lg-9">
+                        <input name="senha_atual" type="password" class="form-control" required>
+                      </div>
+                    </div>
+
+                    <div class="row mb-3">
+                      <label for="newPassword" class="col-md-4 col-lg-3 col-form-label">Nova senha</label>
+                      <div class="col-md-8 col-lg-9">
+                        <input name="nova_senha" id="nova_senha" type="password" class="form-control" required>
+                      </div>
+                    </div>
+
+                    <div class="row mb-3">
+                      <label for="renewPassword" class="col-md-4 col-lg-3 col-form-label">Digite novamente a nova senha</label>
+                      <div class="col-md-8 col-lg-9">
+                        <input name="renova_senha" id="renova_senha" type="password" class="form-control" required>
+                      </div>
+                    </div>
+
+                    <div class="text-center">
+                      <button type="submit" class="btn btn-primary">Salvar senha</button>
+                    </div>
+                  </form><!-- End Change Password Form -->
+                  <div class="mensagem" style="color: red; text-align: center;">
+                    <% if(msg) {%>
+                      <%= msg %>
+                    <%}%>
+                      
+                  </div>
+
+                </div>
+
+              </div><!-- End Bordered Tabs -->
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+  </main><!-- End #main -->
+  <script>
+    const fileInput = document.getElementById("fotoInput");
+    const previewImg = document.getElementById("preview_img");
+    const removeFotoButton = document.getElementById("removeFoto");
+    const removerFotoInput = document.getElementById("remover_foto");
+  
+    fileInput.addEventListener("change", (event) => {
+      const file = event.target.files[0];
+      const fileReader = new FileReader();
+      fileReader.onload = () => {
+        previewImg.src = fileReader.result;
+        removerFotoInput.value = "false"; // Garante que, se o usuário selecionar uma nova foto, a opção de remover seja resetada
+      };
+      if (file) {
+        fileReader.readAsDataURL(file);
+      }
+    });
+  
+    removeFotoButton.addEventListener("click", () => {
+      previewImg.src = "img/user.png";
+      fileInput.value = "";
+      removerFotoInput.value = "true"; // Define que o usuário deseja remover a foto
+    });
+  </script>
+  
+  <script>
+    const msg = "<%= msg %>"; // Mensagem da sua função
+
+    if (msg && msg.includes('A senha foi')) {
+      alert(msg);
+    }else if(msg && msg.includes('A senha atual')) {
+      alert(msg);
+    }
+  </script>
+  <style>
+
+
+.profile_picture img {
+  height: 100px;
+  width: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #dfdfdf;
+}
+
+  </style>
+  <script src="js/novasenha.js"></script>
+  
+
+
+<%-include('./rodape.ejs')%>

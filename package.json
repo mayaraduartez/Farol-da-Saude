@@ -1,0 +1,43 @@
+{
+  "name": "faroldasaude",
+  "version": "1.0.0",
+  "description": "Criação de um sistema chamado Farol da Saude",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js"
+  },
+  "keywords": [
+    "Sistema",
+    "Farol da Saude"
+  ],
+  "author": "Mayara Duarte",
+  "license": "ISC",
+  "dependencies": {
+    "apexcharts": "^3.44.0",
+    "bcrypt": "^5.1.1",
+    "cloudinary": "^1.30.1",
+    "connect-flash": "^0.1.1",
+    "cookie-session": "^2.0.0",
+    "cpf-cnpj-validator": "^1.0.3",
+    "csv": "^6.3.5",
+    "csv-parser": "^3.0.0",
+    "ejs": "^3.1.8",
+    "express": "^4.18.1",
+    "express-session": "^1.17.3",
+    "method-override": "^3.0.0",
+    "moment": "^2.29.4",
+    "multer": "^1.4.5-lts.1",
+    "multer-storage-cloudinary": "^4.0.0",
+    "mysql2": "^3.3.3",
+    "nodemailer": "^6.9.1",
+    "passport": "^0.6.0",
+    "passport-local": "^1.0.0",
+    "pg": "^8.7.3",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.20.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22",
+    "sequelize-cli": "^6.4.1"
+  }
+}

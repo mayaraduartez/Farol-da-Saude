@@ -1,0 +1,72 @@
+<%-include('./cabecalho.ejs')%>
+  <!-- bloco principal -->
+  <main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Alunos</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/principaladm">Principal</a></li>
+          <li class="breadcrumb-item"><a href="/turmas"></a>Turmas</li>
+          <li class="breadcrumb-item active">Ver Alunos</li>
+
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section dashboard">
+      <div class="row">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Alunos da turma:  </h5>
+            <div style="display:flex; gap:20px;">
+            
+          </div>
+
+            <!-- Table with stripped rows -->
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Turma</th>
+                </tr>
+              </thead>
+              <% let linha = 0; %> <% alunosdaturma.forEach(function(alunos) { %> 
+                  <%linha += 1; %>
+              <tbody>
+                <tr class="Turma"> 
+                  <th scope="row">
+                    <%=linha %>
+                  </th>
+                  <td><%=alunos.nome%></td>
+                  <td>
+                    <div style="display: flex; gap: 15px">
+                      <form method="post" action="/verperfil/<%= alunos.id %>">
+                      <button type="submit"  href="" class="btn btn-primary">
+                       Ver Perfil
+                      </button>
+                      </form>
+                      
+                    </div>
+                  </td>
+                </tr>
+                
+                </tr>
+           
+                
+              </tbody>
+              <% }); %>
+            </table>
+            <!-- End Table with stripped rows -->
+
+          </div>
+        </div>
+
+        
+      </div>
+    </section>
+
+  </main><!-- End #main -->
+
+ 
+  <%-include('./rodape.ejs')%>

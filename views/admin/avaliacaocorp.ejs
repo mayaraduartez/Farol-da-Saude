@@ -1,0 +1,167 @@
+<%-include('./cabecalho.ejs')%>
+  <!-- bloco principal -->
+  <main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Formulário de Avaliação Corporal</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/principaladm">Principal</a></li>
+          <li class="breadcrumb-item">Avaliação</li>
+          <li class="breadcrumb-item active">Criar Avaliação Corporal</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+      <div class="row" style="display:flex; align-items: center; justify-content: center;">
+        <div class="card" style="width:80%;">
+          <div class="card-body">
+            <h5 class="card-title">Formulário de Avaliação Corporal</h5>
+
+            <!-- General Form Elements -->
+            <form method="post" action="/avaliacaocorp"  data-parsley-validate>
+              <div class="row mb-3">
+                <label for="inputDate" class="col-sm-2 col-form-label">Aluno Avaliado</label>
+                <div class="col-sm-10">
+                  <input type="text" id="searchInput" class="form-control" onkeyup="filterOptions()" placeholder="Pesquisar aluno">
+                  <select id="select" name="usuario"  class="form-control">
+                    <option value="">Resultado</option>
+                    <% usuarios.forEach((user) => { %>
+                      <% if(!user.admin) { %>
+                      <option  value="<%= user.id %>"><%= user.nome %></option>
+                      <% } %>
+                    <% }); %>
+                  </select>
+              
+              </div>
+              
+              </div>
+              <div class="row mb-3">
+                <label for="inputDate" class="col-sm-2 col-form-label">Avaliador</label>
+                <div class="col-sm-10">
+                  <input type="text" name="avaliador" class="form-control">
+                </div>
+              </div>
+              <div class="row mb-3">
+                <label for="inputDate" class="col-sm-2 col-form-label">Data da avaliação</label>
+                <div class="col-sm-10">
+                  <input type="date" name="data_avaliacao" class="form-control" required>
+                </div>
+              </div>
+              <div class="row mb-3">
+                <label for="inputText" class="col-sm-2 col-form-label">Estatura</label>
+                <div class="col-sm-10">
+                  <input type="text" name="estatura" class="form-control">
+                </div>
+              </div>
+              <div class="row mb-3">
+                <label for="inputText" class="col-sm-2 col-form-label">Peso</label>
+                <div class="col-sm-10">
+                  <input type="text" name="peso" class="form-control">
+                </div>
+              </div>
+              <div class="row mb-3">
+                <label for="inputText" class="col-sm-2 col-form-label">IMC</label>
+                <div class="col-sm-10">
+                  <input type="text"  name="imc" class="form-control">
+                </div>
+              </div>
+              <div class="row mb-3">
+                <label for="inputText" class="col-sm-2 col-form-label">Frequência cardíaca de Repouso</label>
+                <div class="col-sm-10">
+                  <input type="text" name="fcrep" class="form-control">
+                </div>
+              </div>
+              <div class="row mb-3">
+                <label for="inputText" class="col-sm-2 col-form-label">Pressão Arterial Sistólica de Repouso</label>
+                <div class="col-sm-10">
+                  <input type="text" name="pasrep" class="form-control">
+                </div>
+              </div>
+              <div class="row mb-3">
+                <label for="inputText" class="col-sm-2 col-form-label">Pressão Arterial Diastólica de Repouso</label>
+                <div class="col-sm-10">
+                  <input type="text" name="padrep" class="form-control">
+                </div>
+              </div>
+              <div class="row mb-3">
+                <label for="inputText" class="col-sm-2 col-form-label">Gordura Corporal Relativa</label>
+                <div class="col-sm-10">
+                  <input type="text" name="gcr" class="form-control">
+                </div>
+              </div>
+              <div class="row mb-3">
+                <label for="inputText" class="col-sm-2 col-form-label">Massa Magra Relativa</label>
+                <div class="col-sm-10">
+                  <input type="text" name="mmr" class="form-control">
+                </div>
+              </div>
+              <div class="row mb-3">
+                <label for="inputText" class="col-sm-2 col-form-label">Massa Muscular Relativa</label>
+                <div class="col-sm-10">
+                  <input type="text" name="mmur" class="form-control">
+                </div>
+              </div>
+              <div class="row mb-3">
+                <label for="inputText" class="col-sm-2 col-form-label">Água Corporal Relativa</label>
+                <div class="col-sm-10">
+                  <input type="text" name="h2o" class="form-control">
+                </div>
+              </div>
+              <div class="row mb-3">
+                <label for="inputText" class="col-sm-2 col-form-label">Gordura Visceral</label>
+                <div class="col-sm-10">
+                  <input type="text" name="gordvise" class="form-control">
+                </div>
+              </div>
+              <div class="row mb-3">
+                <label for="inputText" class="col-sm-2 col-form-label">Proteínas</label>
+                <div class="col-sm-10">
+                  <input type="text" name="proteina" class="form-control">
+                </div>
+              </div>
+              <div class="row mb-3">
+                <label for="inputText" class="col-sm-2 col-form-label">Taxa de Obesidade</label>
+                <div class="col-sm-10">
+                  <input type="text" name="txobes" class="form-control">
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label class="col-sm-2 col-form-label"></label>
+                <div class="col-sm-10">
+                  <button type="submit" class="btn btn-primary">Salvar Avaliação</button>
+                </div>
+              </div>
+
+            </form><!-- End General Form Elements -->
+
+          </div>
+        </div>
+
+        
+      </div>
+    </section>
+
+  </main><!-- End #main -->
+
+ 
+  <%-include('./rodape.ejs')%>
+  <script>
+    function filterOptions() {
+        var input, filter, select, options, i;
+        input = document.getElementById("searchInput");
+        filter = input.value.toUpperCase();
+        select = document.getElementById("select");
+        options = select.getElementsByTagName("option");
+
+        for (i = 0; i < options.length; i++) {
+            if (options[i].text.toUpperCase().indexOf(filter) > -1) {
+                options[i].style.display = "";
+            } else {
+                options[i].style.display = "none";
+            }
+        }
+    }
+</script>

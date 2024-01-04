@@ -1,0 +1,381 @@
+<%-include('./cabecalho.ejs')%>
+  <!-- bloco principal -->
+  <main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Formulário de Avaliação Depressão, Ansiedade e Estresse</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/principaladm">Principal</a></li>
+          <li class="breadcrumb-item">Avaliação</li>
+          <li class="breadcrumb-item active">Criar Avaliação DAE</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+      <div class="row" style="display:flex; align-items: center; justify-content: center;">
+        <div class="card" style="width:80%;">
+          <div class="card-body">
+            <h5 class="card-title">Formulário de Avaliação Depressão, Ansiedade e Estresse</h5>
+            <div class="alert alert-primary alert-dismissible fade show" role="alert">
+              <h4 class="alert-heading">Informações</h4>
+              <p>Por favor, leia cuidadosamente cada uma das afirmações abaixo e circule o número apropriado 0,1,2 ou 3 que indique o quanto ela se aplicou a você
+                durante a última semana, conforme a indicação a seguir:</p>
+              <hr>
+              <p class="mb-0">0 Não se aplicou de maneira alguma</p>
+              <p class="mb-0">1 Aplicou-se em algum grau, ou por pouco de tempo</p>
+              <p class="mb-0">2 Aplicou-se em um grau considerável, ou por uma boa parte do tempo</p>
+              <p class="mb-0">3 Aplicou-se muito, ou na maioria do tempo</p>
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            <!-- General Form Elements -->
+            <div class="card">
+              <div class="card-body">
+                <p></p>
+                <!-- Bordered Table -->
+                <form method="post" onsubmit="return validateForm()">
+                <table class="table table-bordered">
+                  <thead>
+                    <tr>
+                      <th scope="col"></th>
+                      <th scope="col"></th>
+                      <th scope="col">Não se aplicou de maneira alguma</th>
+                      <th scope="col">Aplicou-se em algum grau, ou por pouco tempo</th>
+                      <th scope="col">Aplicou-se em um grau considerável, ou por uma boa parte do tempo</th>
+                      <th scope="col">Aplicou-se muito, ou na maioria do tempo</th>
+                      
+                    </tr>
+                  </thead>
+                  
+                  <tbody>
+                    <tr>
+                      <th scope="row">1</th>
+                      <td>Achei difícil me acalmar</td>
+                      <td>
+                          <input class="form-check-input" type="radio" name="gridRadios1"  value="0"  >
+                          <label class="form-check-label" for="gridRadios1_0">0</label>
+                      </td>
+                      <td>
+                          <input class="form-check-input" type="radio" name="gridRadios1"  value="1" >
+                          <label class="form-check-label" for="gridRadios1_1">1</label>
+                      </td>
+                      <td>
+                          <input class="form-check-input" type="radio" name="gridRadios1" value="2" >
+                          <label class="form-check-label" for="gridRadios1_2">2</label>
+                      </td>
+                      <td>
+                          <input class="form-check-input" type="radio" name="gridRadios1"  value="3" >
+                          <label class="form-check-label" for="gridRadios1_3">3</label>
+                      </td>
+                  </tr>
+                    <tr>
+                      <th scope="row">2</th>
+                      <td>Senti minha boca seca</td>
+                      <td><input class="form-check-input" type="radio" name="gridRadios2"  value="0"  >
+                          <label class="form-check-label" for="gridRadios2_0">0</label></td>
+                      <td><input class="form-check-input" type="radio" name="gridRadios2"  value="1"  >
+                          <label class="form-check-label" for="gridRadios2_1">1</label></td>
+                      <td><input class="form-check-input" type="radio" name="gridRadios2"  value="2"  >
+                          <label class="form-check-label" for="gridRadios2_2">2</label></td>
+                      <td><input class="form-check-input" type="radio" name="gridRadios2" value="3"  >
+                          <label class="form-check-label" for="gridRadios2_3">3</label></td>
+                  </tr>
+                  <tr>
+                    <th scope="row">3</th>
+                    <td>Não consegui vivenciar nenhum sentimento positivo</td>
+                    <td><input class="form-check-input" type="radio" name="gridRadios3"  value="0" >
+                        <label class="form-check-label" for="gridRadios3_2">0</label></td>
+                    <td><input class="form-check-input" type="radio" name="gridRadios3"  value="1" >
+                        <label class="form-check-label" for="gridRadios3_1">1</label></td>
+                    <td><input class="form-check-input" type="radio" name="gridRadios3" value="2" >
+                        <label class="form-check-label" for="gridRadios3_2">2</label></td>
+                    <td><input class="form-check-input" type="radio" name="gridRadios3"  value="3" >
+                        <label class="form-check-label" for="gridRadios3_3">3</label></td>
+                  </tr>
+                  <tr>
+                    <th scope="row">4</th>
+                    <td>Tive dificuldade em respirar em alguns momentos (ex. respiração
+                      ofegante, falta de ar, sem ter feito nenhum esforço físico)</td>
+                    <td><input class="form-check-input" type="radio" name="gridRadios4"  value="0"  >
+                        <label class="form-check-label" for="gridRadios4_0">0</label></td>
+                    <td><input class="form-check-input" type="radio" name="gridRadios4" value="1"  >
+                        <label class="form-check-label" for="gridRadios4_1">1</label></td>
+                    <td><input class="form-check-input" type="radio" name="gridRadios4"  value="2"  >
+                        <label class="form-check-label" for="gridRadios4_2">2</label></td>
+                    <td><input class="form-check-input" type="radio" name="gridRadios4"   value="3"  >
+                        <label class="form-check-label" for="gridRadios4_3">3</label></td>
+                  </tr>
+                  <tr>
+                    <th scope="row">5</th>
+                    <td>Achei difícil ter iniciativa para fazer as coisas</td>
+                    <td><input class="form-check-input" type="radio" name="gridRadios5"   value="0"  >
+                        <label class="form-check-label" for="gridRadios5_0">0</label></td>
+                    <td><input class="form-check-input" type="radio" name="gridRadios5"   value="1"  >
+                        <label class="form-check-label" for="gridRadios5_1">1</label></td>
+                    <td><input class="form-check-input" type="radio" name="gridRadios5"   value="2"  >
+                        <label class="form-check-label" for="gridRadios5_2">2</label></td>
+                    <td><input class="form-check-input" type="radio" name="gridRadios5"   value="3"  >
+                        <label class="form-check-label" for="gridRadios5_3">3</label></td>
+                  </tr>
+                  <tr>
+                      <th scope="row">6</th>
+                      <td>Tive a tendência de reagir de forma exagerada às situações</td>
+                      <td><input class="form-check-input" type="radio" name="gridRadios6"  value="0"  >
+                          <label class="form-check-label" for="gridRadios6">0</label></td>
+                      <td><input class="form-check-input" type="radio" name="gridRadios6"  value="1"  >
+                          <label class="form-check-label" for="gridRadios6">1</label></td>
+                      <td><input class="form-check-input" type="radio" name="gridRadios6"  value="2"  >
+                          <label class="form-check-label" for="gridRadios6">2</label></td>
+                      <td><input class="form-check-input" type="radio" name="gridRadios6"  value="3"  >
+                          <label class="form-check-label" for="gridRadios6">3</label></td>
+                  </tr>
+                  <tr>
+                    <th scope="row">7</th>
+                    <td>Senti tremores (ex. nas mãos)</td>
+                    <td><input class="form-check-input" type="radio" name="gridRadios7"   value="0"  >
+                        <label class="form-check-label" for="gridRadios5">0</label></td>
+                    <td><input class="form-check-input" type="radio" name="gridRadios7"   value="1"  >
+                        <label class="form-check-label" for="gridRadios5">1</label></td>
+                    <td><input class="form-check-input" type="radio" name="gridRadios7"   value="2"  >
+                        <label class="form-check-label" for="gridRadios5">2</label></td>
+                    <td><input class="form-check-input" type="radio" name="gridRadios7"   value="3"  >
+                        <label class="form-check-label" for="gridRadios5">3</label></td>
+                   </tr>
+                  <tr>
+                    <th scope="row">8</th>
+                    <td>Senti que estava sempre nervoso</td>
+                    <td><input class="form-check-input" type="radio" name="gridRadios8"   value="0"  >
+                        <label class="form-check-label" for="gridRadios6">0</label></td>
+                    <td><input class="form-check-input" type="radio" name="gridRadios8"   value="1"  >
+                        <label class="form-check-label" for="gridRadios6">1</label></td>
+                    <td><input class="form-check-input" type="radio" name="gridRadios8"   value="2"  >
+                        <label class="form-check-label" for="gridRadios6">2</label></td>
+                    <td><input class="form-check-input" type="radio" name="gridRadios8"   value="3"  >
+                        <label class="form-check-label" for="gridRadios6">3</label></td>
+                  </tr>
+                  <tr>
+                    <th scope="row">9</th>
+                    <td>Preocupei-me com situações em que eu pudesse entrar em pânico
+                      e parecesse ridículo (a)</td>
+                    <td><input class="form-check-input" type="radio" name="gridRadios9"   value="0"  >
+                        <label class="form-check-label" for="gridRadios5">0</label></td>
+                    <td><input class="form-check-input" type="radio" name="gridRadios9"   value="1"  >
+                        <label class="form-check-label" for="gridRadios5">1</label></td>
+                    <td><input class="form-check-input" type="radio" name="gridRadios9"   value="2"  >
+                        <label class="form-check-label" for="gridRadios5">2</label></td>
+                    <td><input class="form-check-input" type="radio" name="gridRadios9"   value="3"  >
+                        <label class="form-check-label" for="gridRadios5">3</label></td>
+                  </tr>
+                <tr>
+                    <th scope="row">10</th>
+                    <td>Senti que não tinha nada a desejar</td>
+                    <td><input class="form-check-input" type="radio" name="gridRadios10"   value="0"  >
+                        <label class="form-check-label" for="gridRadios6">0</label></td>
+                    <td><input class="form-check-input" type="radio" name="gridRadios10"   value="1"  >
+                        <label class="form-check-label" for="gridRadios6">1</label></td>
+                    <td><input class="form-check-input" type="radio" name="gridRadios10"   value="2"  >
+                        <label class="form-check-label" for="gridRadios6">2</label></td>
+                    <td><input class="form-check-input" type="radio" name="gridRadios10"   value="3"  >
+                        <label class="form-check-label" for="gridRadios6">3</label></td>
+                </tr>
+                <tr>
+                    <th scope="row">11</th>
+                    <td>Senti-me agitado</td>
+                    <td><input class="form-check-input" type="radio" name="gridRadios11"   value="0"  >
+                        <label class="form-check-label" for="gridRadios5">0</label></td>
+                    <td><input class="form-check-input" type="radio" name="gridRadios11"   value="1"  >
+                        <label class="form-check-label" for="gridRadios5">1</label></td>
+                    <td><input class="form-check-input" type="radio" name="gridRadios11"   value="2"  >
+                        <label class="form-check-label" for="gridRadios5">2</label></td>
+                    <td><input class="form-check-input" type="radio" name="gridRadios11"   value="3"  >
+                        <label class="form-check-label" for="gridRadios5">3</label></td>
+                </tr>
+                <tr>
+                    <th scope="row">12</th>
+                    <td>Achei difícil relaxar</td>
+                    <td><input class="form-check-input" type="radio"  name="gridRadios12"   value="0"  >
+                        <label class="form-check-label" for="gridRadios6">0</label></td>
+                    <td><input class="form-check-input" type="radio"  name="gridRadios12"   value="1"  >
+                        <label class="form-check-label" for="gridRadios6">1</label></td>
+                    <td><input class="form-check-input" type="radio"  name="gridRadios12"   value="2"  >
+                        <label class="form-check-label" for="gridRadios6">2</label></td>
+                    <td><input class="form-check-input" type="radio"  name="gridRadios12"   value="3"  >
+                        <label class="form-check-label" for="gridRadios6">3</label></td>
+                </tr>
+                <tr>
+                    <th scope="row">13</th>
+                    <td>Senti-me depressivo (a) e sem ânimo</td>
+                    <td><input class="form-check-input" type="radio"  name="gridRadios13"   value="0"  >
+                        <label class="form-check-label" for="gridRadios5">0</label></td>
+                    <td><input class="form-check-input" type="radio"  name="gridRadios13"   value="1"  >
+                        <label class="form-check-label" for="gridRadios5">1</label></td>
+                    <td><input class="form-check-input" type="radio"  name="gridRadios13"   value="2"  >
+                        <label class="form-check-label" for="gridRadios5">2</label></td>
+                    <td><input class="form-check-input" type="radio"  name="gridRadios13"   value="3"  >
+                        <label class="form-check-label" for="gridRadios5">3</label></td>
+                </tr>
+                <tr>
+                    <th scope="row">14</th>
+                    <td>Fui intolerante com as coisas que me impediam de continuar o que
+                      eu estava fazendo</td>
+                    <td><input class="form-check-input" type="radio"  name="gridRadios14"   value="0"  >
+                        <label class="form-check-label" for="gridRadios6">0</label></td>
+                    <td><input class="form-check-input" type="radio"  name="gridRadios14"   value="1"  >
+                        <label class="form-check-label" for="gridRadios6">1</label></td>
+                    <td><input class="form-check-input" type="radio"  name="gridRadios14"   value="2"  >
+                        <label class="form-check-label" for="gridRadios6">2</label></td>
+                    <td><input class="form-check-input" type="radio"  name="gridRadios14"   value="3"  >
+                        <label class="form-check-label" for="gridRadios6">3</label></td>
+                </tr>
+                <tr>
+                    <th scope="row">15</th>
+                    <td>Senti que ia entrar em pânico</td>
+                    <td><input class="form-check-input" type="radio"  name="gridRadios15"   value="0"  >
+                        <label class="form-check-label" for="gridRadios5">0</label></td>
+                    <td><input class="form-check-input" type="radio"  name="gridRadios15"   value="1"  >
+                        <label class="form-check-label" for="gridRadios5">1</label></td>
+                    <td><input class="form-check-input" type="radio"  name="gridRadios15"   value="2"  >
+                        <label class="form-check-label" for="gridRadios5">2</label></td>
+                    <td><input class="form-check-input" type="radio"  name="gridRadios15"   value="3"  >
+                        <label class="form-check-label" for="gridRadios5">3</label></td>
+                </tr>
+                <tr>
+                    <th scope="row">16</th>
+                    <td>Não consegui me entusiasmar com nada</td>
+                    <td><input class="form-check-input" type="radio"  name="gridRadios16"   value="0"  >
+                        <label class="form-check-label" for="gridRadios6">0</label></td>
+                    <td><input class="form-check-input" type="radio"  name="gridRadios16"   value="1"  >
+                        <label class="form-check-label" for="gridRadios6">1</label></td>
+                    <td><input class="form-check-input" type="radio"  name="gridRadios16"   value="2"  >
+                        <label class="form-check-label" for="gridRadios6">2</label></td>
+                    <td><input class="form-check-input" type="radio"  name="gridRadios16"   value="3"  >
+                        <label class="form-check-label" for="gridRadios6">3</label></td>
+                </tr>
+                <tr>
+                    <th scope="row">17</th>
+                    <td>Senti que não tinha valor como pessoa</td>
+                    <td><input class="form-check-input" type="radio"  name="gridRadios17"   value="0"  >
+                        <label class="form-check-label" for="gridRadios6">0</label></td>
+                    <td><input class="form-check-input" type="radio"  name="gridRadios17"   value="1"  >
+                        <label class="form-check-label" for="gridRadios6">1</label></td>
+                    <td><input class="form-check-input" type="radio"  name="gridRadios17"   value="2"  >
+                        <label class="form-check-label" for="gridRadios6">2</label></td>
+                    <td><input class="form-check-input" type="radio"  name="gridRadios17"   value="3"  >
+                        <label class="form-check-label" for="gridRadios6">3</label></td>
+                </tr>
+                <tr>
+                    <th scope="row">18</th>
+                    <td>Senti que estava um pouco emotivo/sensível demais</td>
+                    <td><input class="form-check-input" type="radio"  name="gridRadios18"   value="0"  >
+                        <label class="form-check-label" for="gridRadios5">0</label></td>
+                    <td><input class="form-check-input" type="radio"  name="gridRadios18"   value="1"  >
+                        <label class="form-check-label" for="gridRadios5">1</label></td>
+                    <td><input class="form-check-input" type="radio"  name="gridRadios18"   value="2"  >
+                        <label class="form-check-label" for="gridRadios5">2</label></td>
+                    <td><input class="form-check-input" type="radio"  name="gridRadios18"   value="3"  >
+                        <label class="form-check-label" for="gridRadios5">3</label></td>
+                </tr>
+                <tr>
+                    <th scope="row">19</th>
+                    <td>Sabia que meu coração estava alterado mesmo não tendo feito
+                      nenhum esforço físico (ex. aumento da frequência cardíaca,
+                      disritmia cardíaca)</td>
+                    <td><input class="form-check-input" type="radio"  name="gridRadios19"   value="0"  >
+                        <label class="form-check-label" for="gridRadios6">0</label></td>
+                    <td><input class="form-check-input" type="radio"  name="gridRadios19"   value="1"  >
+                        <label class="form-check-label" for="gridRadios6">1</label></td>
+                    <td><input class="form-check-input" type="radio"  name="gridRadios19"   value="2"  >
+                        <label class="form-check-label" for="gridRadios6">2</label></td>
+                    <td><input class="form-check-input" type="radio"  name="gridRadios19"   value="3"  >
+                        <label class="form-check-label" for="gridRadios6">3</label></td>
+                </tr>
+                <tr>
+                    <th scope="row">20</th>
+                    <td>Senti medo sem motivo</td>
+                    <td><input class="form-check-input" type="radio"  name="gridRadios20"   value="0"  >
+                        <label class="form-check-label" for="gridRadios5">0</label></td>
+                    <td><input class="form-check-input" type="radio"  name="gridRadios20"   value="1"  >
+                        <label class="form-check-label" for="gridRadios5">1</label></td>
+                    <td><input class="form-check-input" type="radio"  name="gridRadios20"   value="2"  >
+                        <label class="form-check-label" for="gridRadios5">2</label></td>
+                    <td><input class="form-check-input" type="radio"  name="gridRadios20"   value="3"  >
+                        <label class="form-check-label" for="gridRadios5">3</label></td>
+                </tr>
+                <tr>
+                  <th scope="row">21</th>
+                  <td>Senti que a vida não tinha sentido</td>
+                  <td><input class="form-check-input" type="radio"  name="gridRadios21"   value="0"  >
+                      <label class="form-check-label" for="gridRadios5">0</label></td>
+                  <td><input class="form-check-input" type="radio"  name="gridRadios21"   value="1"  >
+                      <label class="form-check-label" for="gridRadios5">1</label></td>
+                  <td><input class="form-check-input" type="radio"  name="gridRadios21"   value="2"  >
+                      <label class="form-check-label" for="gridRadios5">2</label></td>
+                  <td><input class="form-check-input" type="radio"  name="gridRadios21"   value="3"  >
+                      <label class="form-check-label" for="gridRadios5">3</label></td>
+              </tr>
+
+                  </tbody>
+                  
+                
+                </table>
+                <div class="row mb-3">
+                    
+                    <div class="col-sm-10">
+                      <button type="submit" class="btn btn-primary">Salvar Avaliação</button>
+                    </div>
+                  </div>
+                </form>
+                <!-- End Bordered Table -->
+  
+                
+  
+              </div>
+            </div>
+            
+
+          </div>
+        </div>
+
+        
+      </div>
+    </section>
+
+  </main><!-- End #main -->
+
+ 
+  <%-include('./rodape.ejs')%>
+<script>
+    function validateForm() {
+        
+        var radioGroups = ["gridRadios1", "gridRadios2", "gridRadios3",
+    "gridRadios4", "gridRadios5", "gridRadios6","gridRadios7", "gridRadios8", "gridRadios9",
+    "gridRadios10", "gridRadios11", "gridRadios12",
+    "gridRadios13", "gridRadios14", "gridRadios15",
+    "gridRadios16", "gridRadios17", "gridRadios18",
+    "gridRadios19", "gridRadios20", "gridRadios21",  ];
+
+        
+        for (var i = 0; i < radioGroups.length; i++) {
+            var radioGroup = document.getElementsByName(radioGroups[i]);
+            var radioChecked = false;
+
+            
+            for (var j = 0; j < radioGroup.length; j++) {
+                if (radioGroup[j].checked) {
+                    radioChecked = true;
+                    break;
+                }
+            }
+
+           
+            if (!radioChecked) {
+                alert("Por favor, selecione uma opção para cada pergunta.");
+                return false;
+            }
+        }
+
+        
+        return true;
+    }
+</script>

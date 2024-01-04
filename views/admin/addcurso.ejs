@@ -1,0 +1,55 @@
+<%-include('./cabecalho.ejs')%>
+  <!-- bloco principal -->
+  <main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Adicionar Cursos</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/principaladmin">Principal</a></li>
+          <li class="breadcrumb-item active">Adicionar</li>
+          <li class="breadcrumb-item active">Cursos</li>
+
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+      <div class="row" style="display:flex; align-items: center; justify-content: center;">
+        <div class="card" style="width:80%;">
+          <div class="card-body">
+            <h5 class="card-title">Adicionar um curso</h5>
+
+            <!-- General Form Elements -->
+            <form method="post">
+              
+              <div class="row mb-3">
+                <label for="inputDate" class="col-sm-2 col-form-label">Curso</label>
+                <div class="col-sm-10">
+                  <input type="text" name="curso" class="form-control">
+                </div>
+              </div>
+              <div class="row mb-3">
+                <label class="col-sm-2 col-form-label"></label>
+                <div class="col-sm-10">
+                  <button type="submit" class="btn btn-primary">Salvar Curso</button>
+                </div>
+              </div>
+            </form><!-- End General Form Elements -->
+            <div class="mensagem" style="color: green; text-align: center;">
+              <% if(msg) {%>
+                <%= msg %>
+              <%}%>
+                
+            </div>
+          </div>
+        </div>
+
+        
+      </div>
+    </section>
+
+  </main><!-- End #main -->
+
+ 
+  <%-include('./rodape.ejs')%>

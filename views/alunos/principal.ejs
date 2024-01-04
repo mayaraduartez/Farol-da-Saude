@@ -1,0 +1,357 @@
+<%-include('./cabecalho.ejs')%>
+<!-- bloco principal -->
+<main id="main" class="main">
+  <div class="pagetitle">
+    <h1>Principal</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="/principaladm">Dados gerais dos alunos</a>
+        </li>
+      </ol>
+    </nav>
+  </div>
+  <!-- End Page Title -->
+  <div class="row">
+    <div class="col-lg-6">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Média geral do IMC dos Alunos</h5>
+          <div
+            style="
+              display: flex;
+              flex-direction: column;
+              gap: 50px;
+              align-items: center;
+            "
+          >
+            <div class="boneco" id="boneco" data-imc-score="<%=mediaIMC%>">
+              <div class="cabeca" id="cabeca"></div>
+              <div style="display: flex">
+                <div class="corpo" id="corpo"></div>
+              </div>
+              <div style="display: flex; gap: 15px">
+                <div class="pernas" id="pernas"></div>
+              </div>
+            </div>
+
+            <div class="activity-content">
+              Média do IMC Geral:
+              <a href="#" class="fw-bold text-dark"><%= mediaIMC %></a><br />
+              Classificação de IMC Geral: <% if(mediaIMC === 0){ %>
+              <a class="fw-bold text-dark"
+                >Não há Avaliações do Índice de Massa Corporal</a
+              >
+              <% } else { %>
+              <a class="fw-bold text-dark"><%= classGeralIMC %></a>
+              <% } %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <% if((classSomaD && classSomaA && classSomaE ) == " ") { %> <% } else { %>
+    <div class="col-lg-6">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">
+            Média geral dos níveis de Depressão, Ansiedade e Estresse dos alunos
+          </h5>
+          <div class="graficos-DAE">
+            <div class="resultado-bonecoA" data-depressao-score="<%= mediaD %>">
+              <h5>Depressão:</h5>
+              <div class="boneco">
+                <div id="idCabeçaDepressao" class="cabeca"></div>
+                <div style="display: flex">
+                  <div id="idCorpoDepressao" class="corpo"></div>
+                </div>
+                <div style="display: flex; gap: 15px">
+                  <div id="idPernasDepressao" class="pernas"></div>
+                </div>
+              </div>
+              <br />
+              <h5><%= classSomaD %></h5>
+            </div>
+
+            <div class="resultado-bonecoB" data-ansiedade-score="<%= mediaA %>">
+              <h5>Ansiedade:</h5>
+              <div class="boneco">
+                <div id="idCabeçaAnsiedade" class="cabeca"></div>
+                <div style="display: flex">
+                  <div id="idCorpoAnsiedade" class="corpo"></div>
+                </div>
+                <div style="display: flex; gap: 15px">
+                  <div id="idPernasAnsiedade" class="pernas"></div>
+                </div>
+                <br />
+              </div>
+              <h5><%= classSomaA %></h5>
+            </div>
+
+            <div class="resultado-bonecoC" data-estresse-score="<%= mediaE %>">
+              <h5>Estresse:</h5>
+              <div class="boneco">
+                <div id="idCabeçaEstresse" class="cabeca"></div>
+                <div style="display: flex">
+                  <div id="idCorpoEstresse" class="corpo"></div>
+                </div>
+                <div style="display: flex; gap: 15px">
+                  <div id="idPernasEstresse" class="pernas"></div>
+                </div>
+                <br />
+              </div>
+              <h5><%= classSomaE %></h5>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <% } %> <% if(mediaD == 0 && classSomaD == " ") { %> <% } else { %>
+    <div class="col-lg-6">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Níveis de Depressão ao total de Avaliações</h5>
+
+          <!-- Pie Chart -->
+          <div
+            id="pieChartDepressao"
+            data-dados-1="<%=somaDepressaoNormal%>"
+            data-dados-2="<%=somaDepressaoLeveModerado%>"
+            data-dados-3="<%=somaDepressaoSeveroExSevero%>"
+          ></div>
+
+          <script>
+            var pieChartDepressaoElement =
+              document.querySelector("#pieChartDepressao");
+            var somaDepressaoNormal = parseFloat(
+              pieChartDepressaoElement.getAttribute("data-dados-1")
+            );
+            var somaDepressaoLeveModerado = parseFloat(
+              pieChartDepressaoElement.getAttribute("data-dados-2")
+            );
+            var somaDepressaoSeveroExSevero = parseFloat(
+              pieChartDepressaoElement.getAttribute("data-dados-3")
+            );
+
+            document.addEventListener("DOMContentLoaded", () => {
+              new ApexCharts(document.querySelector("#pieChartDepressao"), {
+                series: [
+                  somaDepressaoNormal,
+                  somaDepressaoLeveModerado,
+                  somaDepressaoSeveroExSevero,
+                ],
+                chart: {
+                  height: 350,
+                  type: "pie",
+                  toolbar: {
+                    show: true,
+                  },
+                },
+                labels: [
+                  "Dentro da normalidade",
+                  "Depressão Leve à Moderado",
+                  "Depressão Severa à Extremamente Severa",
+                ],
+                colors: ["#008000", "#FFD700", "#A52A2A"]
+              }).render();
+            });
+          </script>
+          <!-- End Pie Chart -->
+        </div>
+      </div>
+    </div>
+    <% } %> <% if(mediaA == 0 && classSomaA == " ") { %> <% } else { %>
+    <div class="col-lg-6">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Níveis de Ansiedade ao total de Avaliações</h5>
+
+          <!-- Pie Chart -->
+          <div
+            id="pieChartAnsiedade"
+            data-dados-1="<%=somaAnsiedadeNormal%>"
+            data-dados-2="<%=somaAnsiedadeLeveModerado%>"
+            data-dados-3="<%=somaAnsiedadeSeveroExSevero%>"
+          ></div>
+
+          <script>
+            var pieChartAnsiedadeElement =
+              document.querySelector("#pieChartAnsiedade");
+            var somaAnsiedadeNormal = parseFloat(
+              pieChartAnsiedadeElement.getAttribute("data-dados-1")
+            );
+            var somaAnsiedadeLeveModerado = parseFloat(
+              pieChartAnsiedadeElement.getAttribute("data-dados-2")
+            );
+            var somaAnsiedadeSeveroExSevero = parseFloat(
+              pieChartAnsiedadeElement.getAttribute("data-dados-3")
+            );
+
+            document.addEventListener("DOMContentLoaded", () => {
+              new ApexCharts(document.querySelector("#pieChartAnsiedade"), {
+                series: [
+                  somaAnsiedadeNormal,
+                  somaAnsiedadeLeveModerado,
+                  somaAnsiedadeSeveroExSevero,
+                ],
+                chart: {
+                  height: 350,
+                  type: "pie",
+                  toolbar: {
+                    show: true,
+                  },
+                },
+                labels: [
+                  "Dentro da normalidade",
+                  "Ansiedade Leve à Moderado",
+                  "Ansiedade Severa à Extremamente Severa",
+                ],
+                colors: ["#008000", "#FFD700", "#A52A2A"]
+              }).render();
+            });
+          </script>
+          <!-- End Pie Chart -->
+        </div>
+      </div>
+    </div>
+    <% } %> <% if(mediaE == 0 && classSomaE == " ") { %> <% } else { %>
+    <div class="col-lg-6">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Níveis de Estresse ao total de Avaliações</h5>
+
+          <!-- Pie Chart -->
+          <div
+            id="pieChartEstresse"
+            data-dados-1="<%=somaEstresseNormal%>"
+            data-dados-2="<%=somaEstresseLeveModerado%>"
+            data-dados-3="<%=somaEstresseSeveroExSevero%>"
+          ></div>
+
+          <script>
+            var pieChartElement = document.querySelector("#pieChartEstresse");
+            var somaEstresseNormal = parseFloat(
+              pieChartElement.getAttribute("data-dados-1")
+            );
+            var somaEstresseLeveModerado = parseFloat(
+              pieChartElement.getAttribute("data-dados-2")
+            );
+            var somaEstresseSeveroExSevero = parseFloat(
+              pieChartElement.getAttribute("data-dados-3")
+            );
+
+            document.addEventListener("DOMContentLoaded", () => {
+              new ApexCharts(document.querySelector("#pieChartEstresse"), {
+                series: [
+                  somaEstresseNormal,
+                  somaEstresseLeveModerado,
+                  somaEstresseSeveroExSevero,
+                ],
+                chart: {
+                  height: 350,
+                  type: "pie",
+                  toolbar: {
+                    show: true,
+                  },
+                },
+                labels: [
+                  "Dentro da normalidade",
+                  "Estresse Leve à Moderado",
+                  "Estresse Severa à Extremamente Severa",
+                ],
+                colors: ["#008000", "#FFD700", "#A52A2A"]
+              }).render();
+            });
+          </script>
+          <!-- End Pie Chart -->
+        </div>
+      </div>
+    </div>
+    <% } %> <% if(cursosComMedias == "") { %> <% } else { %>
+    <div class="col-lg-6">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">
+            Comparação das médias de Depressão, Ansiedade e Estresse por Turmas
+          </h5>
+
+          <!-- Donut Chart -->
+          <canvas
+            id="radarChart"
+            data-dados-1="<%= JSON.stringify(cursosComMedias.map(curso => curso.mediaDepressaoCurso)) %>"
+            data-dados-2="<%= JSON.stringify(cursosComMedias.map(curso => curso.mediaAnsiedadeCurso)) %>"
+            data-dados-3="<%= JSON.stringify(cursosComMedias.map(curso => curso.mediaEstresseCurso)) %>"
+            data-cursos="<%= JSON.stringify(cursosComMedias.map(curso => curso.curso)) %>"
+            width="600"
+            height="600"
+          ></canvas>
+
+          <script>
+            document.addEventListener("DOMContentLoaded", () => {
+              var ctx = document.getElementById("radarChart").getContext("2d");
+
+              // Ler os dados dos atributos do elemento canvas
+              var dadosDepressao = JSON.parse(
+                document
+                  .getElementById("radarChart")
+                  .getAttribute("data-dados-1")
+              );
+              var dadosAnsiedade = JSON.parse(
+                document
+                  .getElementById("radarChart")
+                  .getAttribute("data-dados-2")
+              );
+              var dadosEstresse = JSON.parse(
+                document
+                  .getElementById("radarChart")
+                  .getAttribute("data-dados-3")
+              );
+
+              // Lista de cursos
+              var cursos = JSON.parse(
+                document
+                  .getElementById("radarChart")
+                  .getAttribute("data-cursos")
+              );
+
+              var datasets = [];
+
+              // Adicione datasets dinamicamente para cada curso
+              for (let i = 0; i < cursos.length; i++) {
+                datasets.push({
+                  label: cursos[i],
+                  data: [
+                    dadosDepressao[i],
+                    dadosAnsiedade[i],
+                    dadosEstresse[i],
+                  ],
+                });
+              }
+
+              new Chart(ctx, {
+                type: "radar",
+                data: {
+                  labels: ["Depressão", "Ansiedade", "Estresse"],
+                  datasets: datasets,
+                },
+                options: {
+                  scale: {
+                    ticks: {
+                      beginAtZero: true,
+                    },
+                  },
+                },
+              });
+            });
+          </script>
+        </div>
+      </div>
+    </div>
+    <% } %>
+  </div>
+</main>
+<!-- End #main -->
+<script src="/js/graficosprincipal.js"></script>
+<script src="/js/graficobonecos.js"></script>
+<%-include('./rodape.ejs')%>

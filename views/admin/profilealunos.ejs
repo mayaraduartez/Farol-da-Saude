@@ -1,0 +1,201 @@
+<%-include('./cabecalho.ejs')%>
+  <main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Profile</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/principaladm">Principal</a></li>
+          <li class="breadcrumb-item">Meu perfil</li>
+          
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section profile">
+      <div class="row">
+        <div class="col-xl-4">
+
+          <div class="card">
+            <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
+              <div class="profile_picture">
+                <% if (aluno.foto) { %>
+                  <img  src="/img/<%= aluno.foto %>" />
+                <% } else { %>
+                  <img  alt="Profile" src="/img/user.png" />
+                <% } %>
+              </div>
+              <h2><%= aluno.nome%></h2>
+              
+              
+            </div>
+          </div>
+
+        </div>
+
+        <div class="col-xl-8">
+
+          <div class="card">
+            <div class="card-body pt-3">
+              <!-- Bordered Tabs -->
+              <ul class="nav nav-tabs nav-tabs-bordered">
+
+                <li class="nav-item">
+                  <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#profile-overview">Resumo</button>
+                </li>
+
+                <li class="nav-item">
+                  <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-edit">Avaliações</button>
+                </li>
+
+
+              </ul>
+              <div class="tab-content pt-2">
+
+                <div class="tab-pane fade show active profile-overview" id="profile-overview">
+                  
+                  <h5 class="card-title">Detalhes</h5>
+
+                  <div class="row">
+                    <div class="col-lg-3 col-md-4 label ">Nome</div>
+                    <div class="col-lg-9 col-md-8"><%= aluno.nome%></div>
+                  </div>
+                  <div class="row">
+                    <div class="col-lg-3 col-md-4 label ">Matrícula</div>
+                    <div class="col-lg-9 col-md-8"><%= aluno.matricula%></div>
+                  </div>
+                  <div class="row">
+                    <div class="col-lg-3 col-md-4 label">Turma</div>
+                    <div class="col-lg-9 col-md-8">
+                      <% if (aluno.Turma) { %>
+                        <%= aluno.Turma.turma %>
+                      <% } else { %>
+                        O usuário não está em nenhuma Turma!
+                      <% } %>
+                    </div>
+                  </div>
+                  
+                  <div class="row">
+                    <div class="col-lg-3 col-md-4 label">Curso</div>
+                    <div class="col-lg-9 col-md-8">
+                      <% if (aluno.Turma && aluno.Turma.Curso) { %>
+                        <%= aluno.Turma.Curso.curso %>
+                      <% } else { %>
+                        O usuário não está em nenhum curso!
+                      <% } %>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-lg-3 col-md-4 label ">CPF</div>
+                    <div class="col-lg-9 col-md-8"><%= aluno.cpf%></div>
+                  </div>
+                  <div class="row">
+                    <div class="col-lg-3 col-md-4 label ">Etnia</div>
+                    <div class="col-lg-9 col-md-8"><%= aluno.etnia%></div>
+                  </div>
+                  <div class="row">
+                    <div class="col-lg-3 col-md-4 label ">Sexo</div>
+                    <div class="col-lg-9 col-md-8"><%= aluno.sexo%></div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-lg-3 col-md-4 label">Data de Nascimento</div>
+                    <% if (!aluno.data_nascimento) { %>
+                    <div class="col-lg-9 col-md-8" style="color: red;">O aluno não atualizou o perfil! </div>
+                    <% } else { %>
+                    
+                      <div class="col-lg-9 col-md-8"><%= aluno.data_nascimento%></div>
+                      <% } %>
+                  </div>
+                  <div class="row">
+                    <div class="col-lg-3 col-md-4 label">Email</div>
+                    <div class="col-lg-9 col-md-8"><%= aluno.email%></div>
+                  </div>
+
+                </div>
+                  
+
+                </div>
+
+                <div class="tab-pane fade profile-edit pt-3" id="profile-edit">
+
+                  <div class="card">
+                    <div class="card-body">
+                      <h5 class="card-title">Lista de Avaliações do usuario: </h5>
+                      <% if (!avaliacoes.length && !avaliacoesdae.length){ %>
+                      <h3 class="card-title">O usuário não possui avaliações. </h3>
+                      <% } else { %>
+                      
+                      <ul class="list-group list-group-flush">
+                        <% let linha = 0; %> 
+                        <% avaliacoes.forEach(function(avcorp){ %>
+                          <% linha += 1; %>
+                          <li class="list-group-item li">Avaliação Corporal <%= linha %>
+                            <form method="post" action="/veravaliacaocorpaluno/<%= avcorp.id %>">
+                            <button type="submit" class="btn btn-outline-info">Ver avaliação</button>
+                          </form>
+                          <form method="post" action="/deletavaliacaocorpaluno/<%= avcorp.id %>">
+                            <button type="submit" class="btn btn-danger">Apagar avaliação</button>
+                          </form>
+                          </li>
+                        <% }); %>
+                        
+                        <% let index = 0; %> 
+                        <% avaliacoesdae.forEach(function(avdae) { %>
+                          <% index += 1; %>
+                          <li class="list-group-item li">Avaliação DAE <%= index %>
+                            
+                            <form method="post" action="/veravaliacaodaealuno/<%= avdae.id %>">
+                            <button type="submit" class="btn btn-outline-info">Ver avaliação</button>
+                            </form>
+                            <form method="post" action="/deletavaliacaodaealuno/<%= avdae.id %>">
+                              <button type="submit" class="btn btn-danger">Apagar avaliação</button>
+                              </form>
+                          
+                          </li>
+                        <% }); %>
+                      </ul>
+                      <% } %>
+                    </div>
+                  </div>
+                  
+
+                </div>
+                
+
+               
+
+              </div><!-- End Bordered Tabs -->
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+  </main><!-- End #main -->
+
+
+  <style>
+
+
+.profile_picture img {
+  height: 100px;
+  width: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #dfdfdf;
+}
+
+.li {
+  display: flex;
+  gap: 5%;
+}
+
+  </style>
+  <script src="js/novasenha.js"></script>
+  
+
+
+<%-include('./rodape.ejs')%>

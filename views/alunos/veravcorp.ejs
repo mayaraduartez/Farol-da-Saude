@@ -1,0 +1,59 @@
+<%-include('./cabecalho.ejs')%>
+ <!-- bloco principal -->
+ <main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Avaliação</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/principal">Principal</a></li>
+          <li class="breadcrumb-item">Minhas Avaliações</li>
+
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+        
+    <section class="section dashboard">
+        <div class="row">
+          <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Avaliação Depressão, Ansiedade e Estresse</h5>
+  
+                <!-- List group with active and disabled items -->
+                <ul class="list-group list-group-flush">
+                  <li class="list-group-item">Aluno avaliado: <strong><%= avaliacao.Usuario.nome %></strong></li>
+                  <li class="list-group-item">Data que foi feita a Avaliação: <strong><%= avaliacao.data_avaliacao%></strong></li>
+                  <li class="list-group-item">Estatura: <strong><%= avaliacao.estatura %></strong></li>
+                  <li class="list-group-item">Peso: <strong><%= avaliacao.peso %></strong></li>
+                  <li class="list-group-item">IMC: <strong><%= avaliacao.IMC %></strong></li>
+                  <li class="list-group-item">Frequência Cardíaca de Repouso: <strong><%= avaliacao.FCrep %></strong></li>
+                  <li class="list-group-item">Pressão Arterial Sistólica de Repouso: <strong><%= avaliacao.PASrep %></strong></li>
+                  <li class="list-group-item">Pressão Arterial Diastólica de Repouso: <strong><%= avaliacao.PADrep %></strong></li>
+                  <li class="list-group-item">Gordura Corporal Relativa: <strong><%= avaliacao.GCr %></strong></li>
+                  <li class="list-group-item">Massa Magra Relativa: <strong><%= avaliacao.MMr %></strong></li>
+                  <li class="list-group-item">Massa Muscular Relativa: <strong><%= avaliacao.MMUr %></strong></li>
+                  <li class="list-group-item">Água Corporal Relativa: <strong><%= avaliacao.H2O %></strong></li>
+                  <li class="list-group-item">Gordura Visceral: <strong><%= avaliacao.GordVise %></strong></li>
+                  <li class="list-group-item">Taxa de Obesidade: <strong><%= avaliacao.TxObes %></strong></li>
+
+
+
+
+                  
+                  
+                </ul><!-- End Clean list group -->
+                
+             
+        </div>   
+  
+          
+        </div>
+
+
+  </main><!-- End #main -->
+
+<script src="/js/graficobonecos.js"></script>
+
+
+
+<%-include('./rodape.ejs')%>
