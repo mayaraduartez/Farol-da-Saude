@@ -5,7 +5,7 @@
       <h1>Profile</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="/principaladm">Principal</a></li>
+          <li class="breadcrumb-item"><a href="/principal">Principal</a></li>
           <li class="breadcrumb-item">Meu perfil</li>
           
         </ol>
@@ -155,6 +155,7 @@
                       <button type="submit" class="btn btn-primary">Salvar Edições</button>
                     </div>
                   </form>
+                  
 
                 </div>
                 
@@ -238,6 +239,8 @@
     if (msg && msg.includes('A senha foi')) {
       alert(msg);
     }else if(msg && msg.includes('A senha atual')) {
+      alert(msg);
+    }else if(msg && msg.includes('CPF ')){
       alert(msg);
     }
   </script>

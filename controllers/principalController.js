@@ -553,7 +553,8 @@ async function home(req, res) {
         i++;
       } while (i < cursos.length);
 
-      console.log(cursosComMedias);
+     
+      console.table(cursosComMedias);
       
      
 

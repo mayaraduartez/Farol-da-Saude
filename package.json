@@ -39,5 +39,13 @@
   "devDependencies": {
     "nodemon": "^2.0.22",
     "sequelize-cli": "^6.4.1"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mayaraduartez/Farol-da-Saude.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mayaraduartez/Farol-da-Saude/issues"
+  },
+  "homepage": "https://github.com/mayaraduartez/Farol-da-Saude#readme"
 }

@@ -1,12 +1,10 @@
 const express = require("express");
 const app = express();
 const path = require("path");
-const porta = process.env.PORT || 3000;
+const port = process.env.PORT || 3000;
 var session = require("express-session");
 var passport = require("passport"); 
 var moment = require("moment"); 
-const  csv = require('csv');
-const fs = require('fs');
 app.locals.moment = moment;
 
 const principalRoute = require("./router/principalRoute");
@@ -57,6 +55,6 @@ app.use(passport.authenticate("session"));
 app.use("/", principalRoute);
 
 
-app.listen(porta, function () {
-  console.log("Servidor funcionando na porta: " + porta);
+app.listen(port, function () {
+  console.log("Servidor funcionando na porta: " + port);
 });
