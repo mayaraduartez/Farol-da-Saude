@@ -152,6 +152,14 @@ router.post('/deletavaliacaocorpaluno/:id',
 autenticacaoadmin,
 principalController.deletavaliacaocorpaluno);
 
+router.get('/rt',
+autenticacaoadmin,
+principalController.relatorio);
+
+router.post('/rt',
+autenticacaoadmin,
+principalController.emiterelatorio);
+
 //páginas usuario
 
 router.get('/principal',

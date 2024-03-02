@@ -1,6 +1,6 @@
 const bcrypt = require("bcrypt");
 const { Op, Sequelize } = require("sequelize");
-
+const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 const moment = require("moment");
 const Usuario = require("../models/Usuario");
 const Curso = require("../models/Curso");
@@ -11,19 +11,18 @@ const { Readable } = require("stream");
 const fs = require("fs");
 const path = require("path");
 const csv = require("csv-parser");
+const PDFDocument = require("pdfkit");
 
-async function amostra(req,res){
-  const hasAvaliacaoData = await Avaliacao.findOne({
-  });
+async function amostra(req, res) {
+  const hasAvaliacaoData = await Avaliacao.findOne({});
 
-  const hasAvaliacaoDaeData = await AvaliacaoDae.findOne({
-  });
+  const hasAvaliacaoDaeData = await AvaliacaoDae.findOne({});
 
   if (!hasAvaliacaoData && !hasAvaliacaoDaeData) {
     // If no data is found, render the page with default values
     res.render("todos/principal.ejs", {
       mediaIMC: 0,
-      classGeralIMC: " ", 
+      classGeralIMC: " ",
       mediaD: 0,
       mediaA: 0,
       mediaE: 0,
@@ -51,243 +50,315 @@ async function amostra(req,res){
       porcentagemESevExSev: 0,
       cursosComMedias: [],
     });
-    return; 
+    return;
   }
 
-  
-
   const todasAvaliacoes = await Avaliacao.findAll();
-    // Calcular média do IMC
-    let somaIMC = 0;
-    if (todasAvaliacoes && todasAvaliacoes.length > 0) {
-      for (const avaliacao of todasAvaliacoes) {
-        somaIMC += parseFloat(avaliacao.IMC) || 0; // Convertendo para número
-      }
+  // Calcular média do IMC
+  let somaIMC = 0;
+  if (todasAvaliacoes && todasAvaliacoes.length > 0) {
+    for (const avaliacao of todasAvaliacoes) {
+      somaIMC += parseFloat(avaliacao.IMC) || 0; // Convertendo para número
     }
-    const mediaIMC =
-      todasAvaliacoes && todasAvaliacoes.length > 0
-        ? somaIMC / todasAvaliacoes.length
-        : 0;
-   console.log(mediaIMC);
+  }
+  const mediaIMC =
+    todasAvaliacoes && todasAvaliacoes.length > 0
+      ? somaIMC / todasAvaliacoes.length
+      : 0;
+  console.log(mediaIMC);
 
   let classGeralIMC;
-   if(mediaIMC <= 18,5){
-     classGeralIMC = "Abaixo do normal"
-   } else if (mediaIMC < 25,1){
-     classGeralIMC = "Normal"
-   }else {
-    classGeralIMC = "Acima do normal"
-   }
+  if ((mediaIMC <= 18, 5)) {
+    classGeralIMC = "Abaixo do normal";
+  } else if ((mediaIMC < 25, 1)) {
+    classGeralIMC = "Normal";
+  } else {
+    classGeralIMC = "Acima do normal";
+  }
 
-   const todasAvaliacoesdae = await AvaliacaoDae.findAll({});
-   let somaD = 0, somaA = 0, somaE = 0;
-   let somaDepressaoNormal = 0, somaDepressaoLeveModerado = 0, somaDepressaoSeveroExSevero = 0;
-   let somaAnsiedadeNormal = 0, somaAnsiedadeLeveModerado = 0, somaAnsiedadeSeveroExSevero = 0;
-   let somaEstresseNormal = 0, somaEstresseLeveModerado = 0, somaEstresseSeveroExSevero = 0;
-   
-   if (todasAvaliacoesdae && todasAvaliacoesdae.length > 0) {
-     for (const avaliacaodae of todasAvaliacoesdae) {
-       somaD += parseFloat(avaliacaodae.depressaoScore) || 0;
-       somaA += parseFloat(avaliacaodae.ansiedadeScore) || 0;
-       somaE += parseFloat(avaliacaodae.estresseScore) || 0;
-   
-       if (avaliacaodae.depressao == 'normal') {
-         somaDepressaoNormal += 1;
-       } else if (avaliacaodae.depressao == 'leve' || avaliacaodae.depressao == 'moderada') {
-         somaDepressaoLeveModerado += 1;
-       } else if (avaliacaodae.depressao == 'severo' || avaliacaodae.depressao == 'extremamente severo') {
-         somaDepressaoSeveroExSevero += 1;
-       }
-   
-       if (avaliacaodae.ansiedade == 'normal') {
-         somaAnsiedadeNormal += 1;
-       } else if (avaliacaodae.ansiedade == 'leve' || avaliacaodae.ansiedade == 'moderado') {
-         somaAnsiedadeLeveModerado += 1;
-       } else if (avaliacaodae.ansiedade == 'severo' || avaliacaodae.ansiedade == 'extremamente severo') {
-         somaAnsiedadeSeveroExSevero += 1;
-       }
-   
-       if (avaliacaodae.estresse == 'normal') {
-         somaEstresseNormal += 1;
-       } else if (avaliacaodae.estresse == 'leve' || avaliacaodae.estresse == 'moderado') {
-         somaEstresseLeveModerado += 1;
-       } else if (avaliacaodae.estresse == 'severo' || avaliacaodae.estresse == 'extremamente severo') {
-         somaEstresseSeveroExSevero += 1;
-       }
-     }
-   }
+  const todasAvaliacoesdae = await AvaliacaoDae.findAll({});
+  let somaD = 0,
+    somaA = 0,
+    somaE = 0;
+  let somaDepressaoNormal = 0,
+    somaDepressaoLeveModerado = 0,
+    somaDepressaoSeveroExSevero = 0;
+  let somaAnsiedadeNormal = 0,
+    somaAnsiedadeLeveModerado = 0,
+    somaAnsiedadeSeveroExSevero = 0;
+  let somaEstresseNormal = 0,
+    somaEstresseLeveModerado = 0,
+    somaEstresseSeveroExSevero = 0;
 
-    const totalResultados = todasAvaliacoesdae.length;
-    const porcentagemDNormal = ((somaDepressaoNormal/ totalResultados) * 100).toFixed(1);
-    const porcentagemDLeveMod = ((somaDepressaoLeveModerado / totalResultados) * 100).toFixed(1);
-    const porcentagemDSevExSev = ((somaDepressaoSeveroExSevero / totalResultados) * 100).toFixed(1);
+  if (todasAvaliacoesdae && todasAvaliacoesdae.length > 0) {
+    for (const avaliacaodae of todasAvaliacoesdae) {
+      somaD += parseFloat(avaliacaodae.depressaoScore) || 0;
+      somaA += parseFloat(avaliacaodae.ansiedadeScore) || 0;
+      somaE += parseFloat(avaliacaodae.estresseScore) || 0;
 
-    const porcentagemANormal = ((somaAnsiedadeNormal/ totalResultados) * 100).toFixed(1);
-    const porcentagemALeveMod = ((somaAnsiedadeLeveModerado / totalResultados) * 100).toFixed(1);
-    const porcentagemASevExSev = ((somaAnsiedadeSeveroExSevero / totalResultados) * 100).toFixed(1);
-
-    const porcentagemENormal = ((somaEstresseNormal/ totalResultados) * 100).toFixed(1);
-    const porcentagemELeveMod = ((somaEstresseLeveModerado / totalResultados) * 100).toFixed(1);
-    const porcentagemESevExSev = ((somaEstresseSeveroExSevero / totalResultados) * 100).toFixed(1);
-
-    const mediaD = todasAvaliacoesdae && todasAvaliacoesdae.length > 0
-    ? somaD / todasAvaliacoesdae.length
-    : 0;
-
-    const mediaA = todasAvaliacoesdae && todasAvaliacoesdae.length > 0
-    ? somaA / todasAvaliacoesdae.length
-    : 0;
-
-    const mediaE = todasAvaliacoesdae && todasAvaliacoesdae.length > 0
-    ? somaE / todasAvaliacoesdae.length
-    : 0;
-   
-    var classSomaD = " ";
-       var classSomaA = " ";
-       var classSomaE = " ";
-
-      if(mediaD <= 9 ){
-        classSomaD = "Normal";
-      } else if (mediaD <= 20){
-      classSomaD = "Leve à Moderado";
-      } else {
-        classSomaD = "Severo à Extremamente Severo";
+      if (avaliacaodae.depressao == "normal") {
+        somaDepressaoNormal += 1;
+      } else if (
+        avaliacaodae.depressao == "leve" ||
+        avaliacaodae.depressao == "moderada"
+      ) {
+        somaDepressaoLeveModerado += 1;
+      } else if (
+        avaliacaodae.depressao == "severo" ||
+        avaliacaodae.depressao == "extremamente severo"
+      ) {
+        somaDepressaoSeveroExSevero += 1;
       }
 
-      if(mediaA <= 6){
-        classSomaA = "Normal";
-      }else if ( mediaA <=14){
-        classSomaA = "Leve à Moderado";
-      } else {
-        classSomaA = "Severo à Extremamente Severo"
+      if (avaliacaodae.ansiedade == "normal") {
+        somaAnsiedadeNormal += 1;
+      } else if (
+        avaliacaodae.ansiedade == "leve" ||
+        avaliacaodae.ansiedade == "moderado"
+      ) {
+        somaAnsiedadeLeveModerado += 1;
+      } else if (
+        avaliacaodae.ansiedade == "severo" ||
+        avaliacaodae.ansiedade == "extremamente severo"
+      ) {
+        somaAnsiedadeSeveroExSevero += 1;
       }
 
-      if(mediaE <=10){
-        classSomaE = "Normal";
-      }else if(mediaE <=26){
-        classSomaE = "Leve à Moderado"
-      }else{
-        classSomaE = "Severo à Extremamente Severo"
+      if (avaliacaodae.estresse == "normal") {
+        somaEstresseNormal += 1;
+      } else if (
+        avaliacaodae.estresse == "leve" ||
+        avaliacaodae.estresse == "moderado"
+      ) {
+        somaEstresseLeveModerado += 1;
+      } else if (
+        avaliacaodae.estresse == "severo" ||
+        avaliacaodae.estresse == "extremamente severo"
+      ) {
+        somaEstresseSeveroExSevero += 1;
       }
+    }
+  }
 
-      
+  const totalResultados = todasAvaliacoesdae.length;
+  const porcentagemDNormal = (
+    (somaDepressaoNormal / totalResultados) *
+    100
+  ).toFixed(1);
+  const porcentagemDLeveMod = (
+    (somaDepressaoLeveModerado / totalResultados) *
+    100
+  ).toFixed(1);
+  const porcentagemDSevExSev = (
+    (somaDepressaoSeveroExSevero / totalResultados) *
+    100
+  ).toFixed(1);
 
-      
+  const porcentagemANormal = (
+    (somaAnsiedadeNormal / totalResultados) *
+    100
+  ).toFixed(1);
+  const porcentagemALeveMod = (
+    (somaAnsiedadeLeveModerado / totalResultados) *
+    100
+  ).toFixed(1);
+  const porcentagemASevExSev = (
+    (somaAnsiedadeSeveroExSevero / totalResultados) *
+    100
+  ).toFixed(1);
 
-      const cursos = await Curso.findAll({
+  const porcentagemENormal = (
+    (somaEstresseNormal / totalResultados) *
+    100
+  ).toFixed(1);
+  const porcentagemELeveMod = (
+    (somaEstresseLeveModerado / totalResultados) *
+    100
+  ).toFixed(1);
+  const porcentagemESevExSev = (
+    (somaEstresseSeveroExSevero / totalResultados) *
+    100
+  ).toFixed(1);
+
+  const mediaD =
+    todasAvaliacoesdae && todasAvaliacoesdae.length > 0
+      ? somaD / todasAvaliacoesdae.length
+      : 0;
+
+  const mediaA =
+    todasAvaliacoesdae && todasAvaliacoesdae.length > 0
+      ? somaA / todasAvaliacoesdae.length
+      : 0;
+
+  const mediaE =
+    todasAvaliacoesdae && todasAvaliacoesdae.length > 0
+      ? somaE / todasAvaliacoesdae.length
+      : 0;
+
+  var classSomaD = " ";
+  var classSomaA = " ";
+  var classSomaE = " ";
+
+  if (mediaD <= 9) {
+    classSomaD = "Normal";
+  } else if (mediaD <= 20) {
+    classSomaD = "Leve à Moderado";
+  } else {
+    classSomaD = "Severo à Extremamente Severo";
+  }
+
+  if (mediaA <= 6) {
+    classSomaA = "Normal";
+  } else if (mediaA <= 14) {
+    classSomaA = "Leve à Moderado";
+  } else {
+    classSomaA = "Severo à Extremamente Severo";
+  }
+
+  if (mediaE <= 10) {
+    classSomaE = "Normal";
+  } else if (mediaE <= 26) {
+    classSomaE = "Leve à Moderado";
+  } else {
+    classSomaE = "Severo à Extremamente Severo";
+  }
+
+  const cursos = await Curso.findAll({
+    include: [
+      {
+        model: Turmas,
         include: [
           {
-            model: Turmas,
+            model: Usuario,
             include: [
               {
-                model: Usuario,
-                include: [
-                  {
-                    model: AvaliacaoDae,
-                  },
-                ],
+                model: AvaliacaoDae,
               },
             ],
           },
         ],
-      }); // Supondo que você tenha um método findAll para buscar todos os cursos
+      },
+    ],
+  }); // Supondo que você tenha um método findAll para buscar todos os cursos
 
+  const cursosComMedias = [];
 
-      const cursosComMedias = [];
+  let i = 0;
+  do {
+    const cursoId = cursos[i].id;
 
-      let i = 0;
-      do {
-        const cursoId = cursos[i].id;
-      
-        const usuariosDoCurso = await Usuario.findAll({
-          include: [
-            {
-              model: Turmas,
-              where: { CursoId: cursoId },
-            },
-          ],
-        });
-        
-        // Encontrar todas as avaliações dos usuários do curso
-        const avaliacoesDoCurso = await AvaliacaoDae.findAll({
-          where: {
-            UsuarioId: usuariosDoCurso.map(usuario => usuario.id),
-          },
-        });
-        
-        
-        
-        const mediaPontuacoes = avaliacoesDoCurso.reduce((media, avaliacao) => {
+    const usuariosDoCurso = await Usuario.findAll({
+      include: [
+        {
+          model: Turmas,
+          where: { CursoId: cursoId },
+        },
+      ],
+    });
+
+    // Encontrar todas as avaliações dos usuários do curso
+    const avaliacoesDoCurso = await AvaliacaoDae.findAll({
+      where: {
+        UsuarioId: usuariosDoCurso.map((usuario) => usuario.id),
+      },
+    });
+
+    const mediaPontuacoes = avaliacoesDoCurso.reduce(
+      (media, avaliacao) => {
         media.depressao += avaliacao.depressaoScore / avaliacoesDoCurso.length;
         media.ansiedade += avaliacao.ansiedadeScore / avaliacoesDoCurso.length;
         media.estresse += avaliacao.estresseScore / avaliacoesDoCurso.length;
         return media;
-        }, { depressao: 0, ansiedade: 0, estresse: 0 });
-        
-        const mediaDepressaoCurso = mediaPontuacoes.depressao;
-        const mediaAnsiedadeCurso = mediaPontuacoes.ansiedade;
-        const mediaEstresseCurso = mediaPontuacoes.estresse;
-        
-        // Salvar os resultados para cada curso, incluindo o nome do curso
-  cursosComMedias.push({
-    curso: cursos[i].curso, // Substitua 'nome' pela propriedade correta do curso
-    mediaDepressaoCurso,
-    mediaAnsiedadeCurso,
-    mediaEstresseCurso,
+      },
+      { depressao: 0, ansiedade: 0, estresse: 0 }
+    );
+
+    const mediaDepressaoCurso = mediaPontuacoes.depressao;
+    const mediaAnsiedadeCurso = mediaPontuacoes.ansiedade;
+    const mediaEstresseCurso = mediaPontuacoes.estresse;
+
+    // Salvar os resultados para cada curso, incluindo o nome do curso
+    cursosComMedias.push({
+      curso: cursos[i].curso, // Substitua 'nome' pela propriedade correta do curso
+      mediaDepressaoCurso,
+      mediaAnsiedadeCurso,
+      mediaEstresseCurso,
+    });
+
+    console.log(
+      `Média de Depressão para ${cursos[i].nome}:`,
+      mediaDepressaoCurso
+    );
+    console.log(
+      `Média de Ansiedade para ${cursos[i].nome}:`,
+      mediaAnsiedadeCurso
+    );
+    console.log(
+      `Média de Estresse para ${cursos[i].nome}:`,
+      mediaEstresseCurso
+    );
+
+    i++;
+  } while (i < cursos.length);
+
+  console.log(cursosComMedias);
+
+  console.log("soma de depressao total: ", somaD);
+  console.log("soma de ansiedade total: ", somaA);
+  console.log("soma de estresse total: ", somaE);
+
+  console.log("Media Depressao: ", mediaD);
+  console.log("Media Ansiedade: ", mediaA);
+  console.log("Media Estresse: ", mediaE);
+  console.log("Soma Depressão Normal: ", somaDepressaoNormal);
+  console.log("Soma Depressão Lev-Mod: ", somaDepressaoLeveModerado);
+  console.log("Soma Depressão Seve-ExtSeve: ", somaDepressaoSeveroExSevero);
+  console.log("Soma Ansiedade Normal: ", somaAnsiedadeNormal);
+  console.log("Soma Ansiedade Lev-Mod: ", somaAnsiedadeLeveModerado);
+  console.log("Soma Ansiedade Seve-ExtSeve: ", somaAnsiedadeSeveroExSevero);
+  console.log("Soma Estresse Normal: ", somaEstresseNormal);
+  console.log("Soma Estresse Lev-Mod: ", somaEstresseLeveModerado);
+  console.log("Soma Estresse Seve-ExtSeve", somaEstresseSeveroExSevero);
+  console.log("% Depressao Normal: ", porcentagemDNormal);
+  console.log("% Depressao Leve-Mod: ", porcentagemDLeveMod);
+  console.log("% Depressao Seve-ExtSeve: ", porcentagemDSevExSev);
+  console.log("% Ansiedade Normal: ", porcentagemANormal);
+  console.log("% Ansiedade Leve-Mod: : ", porcentagemALeveMod);
+  console.log("% Ansiedade Seve-ExtSeve: ", porcentagemASevExSev);
+  console.log("% Estresse Normal: ", porcentagemENormal);
+  console.log("% Estresse Leve-Mod: ", porcentagemELeveMod);
+  console.log("% Estresse Seve-ExtSeve: ", porcentagemESevExSev);
+
+  res.render("todos/principal.ejs", {
+    mediaIMC,
+    classGeralIMC,
+    mediaD,
+    mediaA,
+    mediaE,
+    somaDepressaoNormal,
+    somaDepressaoLeveModerado,
+    somaDepressaoSeveroExSevero,
+    somaAnsiedadeNormal,
+    somaAnsiedadeLeveModerado,
+    somaAnsiedadeSeveroExSevero,
+    somaEstresseNormal,
+    somaEstresseLeveModerado,
+    somaEstresseSeveroExSevero,
+    todasAvaliacoesdae,
+    classSomaA,
+    classSomaD,
+    classSomaE,
+    porcentagemDNormal,
+    porcentagemDLeveMod,
+    porcentagemDSevExSev,
+    porcentagemANormal,
+    porcentagemALeveMod,
+    porcentagemASevExSev,
+    porcentagemENormal,
+    porcentagemELeveMod,
+    porcentagemESevExSev,
+    cursosComMedias,
   });
-
-  console.log(`Média de Depressão para ${cursos[i].nome}:`, mediaDepressaoCurso);
-  console.log(`Média de Ansiedade para ${cursos[i].nome}:`, mediaAnsiedadeCurso);
-  console.log(`Média de Estresse para ${cursos[i].nome}:`, mediaEstresseCurso);
-
-      
-        i++;
-      } while (i < cursos.length);
-
-      console.log(cursosComMedias);
-      
-     
-
-      
-      console.log('soma de depressao total: ', somaD);
-      console.log('soma de ansiedade total: ', somaA);
-      console.log('soma de estresse total: ', somaE);
-
-      
-      
-
-      console.log("Media Depressao: ", mediaD);
-      console.log("Media Ansiedade: ", mediaA);
-      console.log("Media Estresse: ", mediaE);
-      console.log("Soma Depressão Normal: ", somaDepressaoNormal);
-      console.log("Soma Depressão Lev-Mod: ", somaDepressaoLeveModerado);
-      console.log("Soma Depressão Seve-ExtSeve: ", somaDepressaoSeveroExSevero);
-      console.log("Soma Ansiedade Normal: ", somaAnsiedadeNormal);
-      console.log("Soma Ansiedade Lev-Mod: ", somaAnsiedadeLeveModerado);
-      console.log("Soma Ansiedade Seve-ExtSeve: ", somaAnsiedadeSeveroExSevero);
-      console.log("Soma Estresse Normal: ", somaEstresseNormal);
-      console.log("Soma Estresse Lev-Mod: ", somaEstresseLeveModerado);
-      console.log("Soma Estresse Seve-ExtSeve", somaEstresseSeveroExSevero);
-      console.log("% Depressao Normal: ", porcentagemDNormal);
-      console.log("% Depressao Leve-Mod: " , porcentagemDLeveMod);
-      console.log("% Depressao Seve-ExtSeve: ", porcentagemDSevExSev);
-      console.log("% Ansiedade Normal: ", porcentagemANormal);
-      console.log("% Ansiedade Leve-Mod: : ", porcentagemALeveMod);
-      console.log("% Ansiedade Seve-ExtSeve: ", porcentagemASevExSev);
-      console.log("% Estresse Normal: ", porcentagemENormal);
-      console.log("% Estresse Leve-Mod: ", porcentagemELeveMod);
-      console.log("% Estresse Seve-ExtSeve: ", porcentagemESevExSev);
-
-
-  res.render("todos/principal.ejs", { 
- mediaIMC, classGeralIMC, mediaD, mediaA, mediaE,
-  somaDepressaoNormal,somaDepressaoLeveModerado, somaDepressaoSeveroExSevero, somaAnsiedadeNormal,
-  somaAnsiedadeLeveModerado, somaAnsiedadeSeveroExSevero, somaEstresseNormal, somaEstresseLeveModerado, 
-  somaEstresseSeveroExSevero, todasAvaliacoesdae, classSomaA, classSomaD, classSomaE,
-  porcentagemDNormal, porcentagemDLeveMod, porcentagemDSevExSev, porcentagemANormal, porcentagemALeveMod,
-  porcentagemASevExSev, porcentagemENormal, porcentagemELeveMod, porcentagemESevExSev,
-  cursosComMedias,
-});
 }
 
 async function importausuario(req, res) {
@@ -303,18 +374,16 @@ async function importausuario(req, res) {
 async function home(req, res) {
   const usuarioreq = await importausuario(req);
 
-  const hasAvaliacaoData = await Avaliacao.findOne({
-  });
+  const hasAvaliacaoData = await Avaliacao.findOne({});
 
-  const hasAvaliacaoDaeData = await AvaliacaoDae.findOne({
-  });
+  const hasAvaliacaoDaeData = await AvaliacaoDae.findOne({});
 
   if (!hasAvaliacaoData && !hasAvaliacaoDaeData) {
     // If no data is found, render the page with default values
     res.render("admin/principal.ejs", {
       usuario: usuarioreq,
       mediaIMC: 0,
-      classGeralIMC: " ", 
+      classGeralIMC: " ",
       mediaD: 0,
       mediaA: 0,
       mediaE: 0,
@@ -342,7 +411,7 @@ async function home(req, res) {
       porcentagemESevExSev: 0,
       cursosComMedias: [],
     });
-    return; 
+    return;
   }
 
   const usuario = await Usuario.findOne({
@@ -355,249 +424,323 @@ async function home(req, res) {
     include: {
       model: Usuario,
       where: {
-        TurmaId: { [Op.not]: null } // Só busca avaliações de usuários que pertecem alguma turma
-      }
-    }
+        TurmaId: { [Op.not]: null }, // Só busca avaliações de usuários que pertecem alguma turma
+      },
+    },
   });
-    // Calcular média do IMC
-    let somaIMC = 0;
-    if (todasAvaliacoes && todasAvaliacoes.length > 0) {
-      for (const avaliacao of todasAvaliacoes) {
-        somaIMC += parseFloat(avaliacao.IMC) || 0; // Convertendo para número
-      }
+  // Calcular média do IMC
+  let somaIMC = 0;
+  if (todasAvaliacoes && todasAvaliacoes.length > 0) {
+    for (const avaliacao of todasAvaliacoes) {
+      somaIMC += parseFloat(avaliacao.IMC) || 0; // Convertendo para número
     }
-    const mediaIMC =
-      todasAvaliacoes && todasAvaliacoes.length > 0
-        ? somaIMC / todasAvaliacoes.length
-        : 0;
-   console.log(mediaIMC);
+  }
+  const mediaIMC =
+    todasAvaliacoes && todasAvaliacoes.length > 0
+      ? somaIMC / todasAvaliacoes.length
+      : 0;
+  console.log(mediaIMC);
 
   let classGeralIMC;
-   if(mediaIMC <= 18,5){
-     classGeralIMC = "Abaixo do normal"
-   } else if (mediaIMC < 25,1){
-     classGeralIMC = "Normal"
-   }else {
-    classGeralIMC = "Acima do normal"
-   }
+  if ((mediaIMC <= 18, 5)) {
+    classGeralIMC = "Abaixo do normal";
+  } else if ((mediaIMC < 25, 1)) {
+    classGeralIMC = "Normal";
+  } else {
+    classGeralIMC = "Acima do normal";
+  }
 
-   const todasAvaliacoesdae = await AvaliacaoDae.findAll({
+  const todasAvaliacoesdae = await AvaliacaoDae.findAll({
     include: {
       model: Usuario,
       where: {
-        TurmaId: { [Op.not]: null } // Só busca avaliações de usuários que pertecem alguma turma
+        TurmaId: { [Op.not]: null }, // Só busca avaliações de usuários que pertecem alguma turma
+      },
+    },
+  });
+  let somaD = 0,
+    somaA = 0,
+    somaE = 0;
+  let somaDepressaoNormal = 0,
+    somaDepressaoLeveModerado = 0,
+    somaDepressaoSeveroExSevero = 0;
+  let somaAnsiedadeNormal = 0,
+    somaAnsiedadeLeveModerado = 0,
+    somaAnsiedadeSeveroExSevero = 0;
+  let somaEstresseNormal = 0,
+    somaEstresseLeveModerado = 0,
+    somaEstresseSeveroExSevero = 0;
+
+  if (todasAvaliacoesdae && todasAvaliacoesdae.length > 0) {
+    for (const avaliacaodae of todasAvaliacoesdae) {
+      somaD += parseFloat(avaliacaodae.depressaoScore) || 0;
+      somaA += parseFloat(avaliacaodae.ansiedadeScore) || 0;
+      somaE += parseFloat(avaliacaodae.estresseScore) || 0;
+
+      if (avaliacaodae.depressao == "normal") {
+        somaDepressaoNormal += 1;
+      } else if (
+        avaliacaodae.depressao == "leve" ||
+        avaliacaodae.depressao == "moderada"
+      ) {
+        somaDepressaoLeveModerado += 1;
+      } else if (
+        avaliacaodae.depressao == "severo" ||
+        avaliacaodae.depressao == "extremamente severo"
+      ) {
+        somaDepressaoSeveroExSevero += 1;
+      }
+
+      if (avaliacaodae.ansiedade == "normal") {
+        somaAnsiedadeNormal += 1;
+      } else if (
+        avaliacaodae.ansiedade == "leve" ||
+        avaliacaodae.ansiedade == "moderado"
+      ) {
+        somaAnsiedadeLeveModerado += 1;
+      } else if (
+        avaliacaodae.ansiedade == "severo" ||
+        avaliacaodae.ansiedade == "extremamente severo"
+      ) {
+        somaAnsiedadeSeveroExSevero += 1;
+      }
+
+      if (avaliacaodae.estresse == "normal") {
+        somaEstresseNormal += 1;
+      } else if (
+        avaliacaodae.estresse == "leve" ||
+        avaliacaodae.estresse == "moderado"
+      ) {
+        somaEstresseLeveModerado += 1;
+      } else if (
+        avaliacaodae.estresse == "severo" ||
+        avaliacaodae.estresse == "extremamente severo"
+      ) {
+        somaEstresseSeveroExSevero += 1;
       }
     }
-  });
-   let somaD = 0, somaA = 0, somaE = 0;
-   let somaDepressaoNormal = 0, somaDepressaoLeveModerado = 0, somaDepressaoSeveroExSevero = 0;
-   let somaAnsiedadeNormal = 0, somaAnsiedadeLeveModerado = 0, somaAnsiedadeSeveroExSevero = 0;
-   let somaEstresseNormal = 0, somaEstresseLeveModerado = 0, somaEstresseSeveroExSevero = 0;
-   
-   if (todasAvaliacoesdae && todasAvaliacoesdae.length > 0) {
-     for (const avaliacaodae of todasAvaliacoesdae) {
-       somaD += parseFloat(avaliacaodae.depressaoScore) || 0;
-       somaA += parseFloat(avaliacaodae.ansiedadeScore) || 0;
-       somaE += parseFloat(avaliacaodae.estresseScore) || 0;
-   
-       if (avaliacaodae.depressao == 'normal') {
-         somaDepressaoNormal += 1;
-       } else if (avaliacaodae.depressao == 'leve' || avaliacaodae.depressao == 'moderada') {
-         somaDepressaoLeveModerado += 1;
-       } else if (avaliacaodae.depressao == 'severo' || avaliacaodae.depressao == 'extremamente severo') {
-         somaDepressaoSeveroExSevero += 1;
-       }
-   
-       if (avaliacaodae.ansiedade == 'normal') {
-         somaAnsiedadeNormal += 1;
-       } else if (avaliacaodae.ansiedade == 'leve' || avaliacaodae.ansiedade == 'moderado') {
-         somaAnsiedadeLeveModerado += 1;
-       } else if (avaliacaodae.ansiedade == 'severo' || avaliacaodae.ansiedade == 'extremamente severo') {
-         somaAnsiedadeSeveroExSevero += 1;
-       }
-   
-       if (avaliacaodae.estresse == 'normal') {
-         somaEstresseNormal += 1;
-       } else if (avaliacaodae.estresse == 'leve' || avaliacaodae.estresse == 'moderado') {
-         somaEstresseLeveModerado += 1;
-       } else if (avaliacaodae.estresse == 'severo' || avaliacaodae.estresse == 'extremamente severo') {
-         somaEstresseSeveroExSevero += 1;
-       }
-     }
-   }
+  }
 
-    const totalResultados = todasAvaliacoesdae.length;
-    const porcentagemDNormal = ((somaDepressaoNormal/ totalResultados) * 100).toFixed(1);
-    const porcentagemDLeveMod = ((somaDepressaoLeveModerado / totalResultados) * 100).toFixed(1);
-    const porcentagemDSevExSev = ((somaDepressaoSeveroExSevero / totalResultados) * 100).toFixed(1);
+  const totalResultados = todasAvaliacoesdae.length;
+  const porcentagemDNormal = (
+    (somaDepressaoNormal / totalResultados) *
+    100
+  ).toFixed(1);
+  const porcentagemDLeveMod = (
+    (somaDepressaoLeveModerado / totalResultados) *
+    100
+  ).toFixed(1);
+  const porcentagemDSevExSev = (
+    (somaDepressaoSeveroExSevero / totalResultados) *
+    100
+  ).toFixed(1);
 
-    const porcentagemANormal = ((somaAnsiedadeNormal/ totalResultados) * 100).toFixed(1);
-    const porcentagemALeveMod = ((somaAnsiedadeLeveModerado / totalResultados) * 100).toFixed(1);
-    const porcentagemASevExSev = ((somaAnsiedadeSeveroExSevero / totalResultados) * 100).toFixed(1);
+  const porcentagemANormal = (
+    (somaAnsiedadeNormal / totalResultados) *
+    100
+  ).toFixed(1);
+  const porcentagemALeveMod = (
+    (somaAnsiedadeLeveModerado / totalResultados) *
+    100
+  ).toFixed(1);
+  const porcentagemASevExSev = (
+    (somaAnsiedadeSeveroExSevero / totalResultados) *
+    100
+  ).toFixed(1);
 
-    const porcentagemENormal = ((somaEstresseNormal/ totalResultados) * 100).toFixed(1);
-    const porcentagemELeveMod = ((somaEstresseLeveModerado / totalResultados) * 100).toFixed(1);
-    const porcentagemESevExSev = ((somaEstresseSeveroExSevero / totalResultados) * 100).toFixed(1);
+  const porcentagemENormal = (
+    (somaEstresseNormal / totalResultados) *
+    100
+  ).toFixed(1);
+  const porcentagemELeveMod = (
+    (somaEstresseLeveModerado / totalResultados) *
+    100
+  ).toFixed(1);
+  const porcentagemESevExSev = (
+    (somaEstresseSeveroExSevero / totalResultados) *
+    100
+  ).toFixed(1);
 
-    const mediaD = todasAvaliacoesdae && todasAvaliacoesdae.length > 0
-    ? somaD / todasAvaliacoesdae.length
-    : 0;
+  const mediaD =
+    todasAvaliacoesdae && todasAvaliacoesdae.length > 0
+      ? somaD / todasAvaliacoesdae.length
+      : 0;
 
-    const mediaA = todasAvaliacoesdae && todasAvaliacoesdae.length > 0
-    ? somaA / todasAvaliacoesdae.length
-    : 0;
+  const mediaA =
+    todasAvaliacoesdae && todasAvaliacoesdae.length > 0
+      ? somaA / todasAvaliacoesdae.length
+      : 0;
 
-    const mediaE = todasAvaliacoesdae && todasAvaliacoesdae.length > 0
-    ? somaE / todasAvaliacoesdae.length
-    : 0;
-   
-    var classSomaD = " ";
-       var classSomaA = " ";
-       var classSomaE = " ";
+  const mediaE =
+    todasAvaliacoesdae && todasAvaliacoesdae.length > 0
+      ? somaE / todasAvaliacoesdae.length
+      : 0;
 
-      if(mediaD <= 9 ){
-        classSomaD = "Normal";
-      } else if (mediaD <= 20){
-      classSomaD = "Leve à Moderado";
-      } else {
-        classSomaD = "Severo à Extremamente Severo";
-      }
+  var classSomaD = " ";
+  var classSomaA = " ";
+  var classSomaE = " ";
 
-      if(mediaA <= 6){
-        classSomaA = "Normal";
-      }else if ( mediaA <=14){
-        classSomaA = "Leve à Moderado";
-      } else {
-        classSomaA = "Severo à Extremamente Severo"
-      }
+  if (mediaD <= 9) {
+    classSomaD = "Normal";
+  } else if (mediaD <= 20) {
+    classSomaD = "Leve à Moderado";
+  } else {
+    classSomaD = "Severo à Extremamente Severo";
+  }
 
-      if(mediaE <=10){
-        classSomaE = "Normal";
-      }else if(mediaE <=26){
-        classSomaE = "Leve à Moderado"
-      }else{
-        classSomaE = "Severo à Extremamente Severo"
-      }
+  if (mediaA <= 6) {
+    classSomaA = "Normal";
+  } else if (mediaA <= 14) {
+    classSomaA = "Leve à Moderado";
+  } else {
+    classSomaA = "Severo à Extremamente Severo";
+  }
 
-      
+  if (mediaE <= 10) {
+    classSomaE = "Normal";
+  } else if (mediaE <= 26) {
+    classSomaE = "Leve à Moderado";
+  } else {
+    classSomaE = "Severo à Extremamente Severo";
+  }
 
-      
-
-      const cursos = await Curso.findAll({
+  const cursos = await Curso.findAll({
+    include: [
+      {
+        model: Turmas,
         include: [
           {
-            model: Turmas,
+            model: Usuario,
             include: [
               {
-                model: Usuario,
-                include: [
-                  {
-                    model: AvaliacaoDae,
-                  },
-                ],
+                model: AvaliacaoDae,
               },
             ],
           },
         ],
-      }); // Supondo que você tenha um método findAll para buscar todos os cursos
+      },
+    ],
+  }); // Supondo que você tenha um método findAll para buscar todos os cursos
 
+  const cursosComMedias = [];
 
-      const cursosComMedias = [];
+  let i = 0;
+  do {
+    const cursoId = cursos[i].id;
 
-      let i = 0;
-      do {
-        const cursoId = cursos[i].id;
-      
-        const usuariosDoCurso = await Usuario.findAll({
-          include: [
-            {
-              model: Turmas,
-              where: { CursoId: cursoId },
-            },
-          ],
-        });
-        
-        // Encontrar todas as avaliações dos usuários do curso
-        const avaliacoesDoCurso = await AvaliacaoDae.findAll({
-          where: {
-            UsuarioId: usuariosDoCurso.map(usuario => usuario.id),
-          },
-        });
-        
-        
-        
-        const mediaPontuacoes = avaliacoesDoCurso.reduce((media, avaliacao) => {
+    const usuariosDoCurso = await Usuario.findAll({
+      include: [
+        {
+          model: Turmas,
+          where: { CursoId: cursoId },
+        },
+      ],
+    });
+
+    // Encontrar todas as avaliações dos usuários do curso
+    const avaliacoesDoCurso = await AvaliacaoDae.findAll({
+      where: {
+        UsuarioId: usuariosDoCurso.map((usuario) => usuario.id),
+      },
+    });
+
+    const mediaPontuacoes = avaliacoesDoCurso.reduce(
+      (media, avaliacao) => {
         media.depressao += avaliacao.depressaoScore / avaliacoesDoCurso.length;
         media.ansiedade += avaliacao.ansiedadeScore / avaliacoesDoCurso.length;
         media.estresse += avaliacao.estresseScore / avaliacoesDoCurso.length;
         return media;
-        }, { depressao: 0, ansiedade: 0, estresse: 0 });
-        
-        const mediaDepressaoCurso = mediaPontuacoes.depressao;
-        const mediaAnsiedadeCurso = mediaPontuacoes.ansiedade;
-        const mediaEstresseCurso = mediaPontuacoes.estresse;
-        
-        // Salvar os resultados para cada curso, incluindo o nome do curso
-  cursosComMedias.push({
-    curso: cursos[i].curso, // Substitua 'nome' pela propriedade correta do curso
-    mediaDepressaoCurso,
-    mediaAnsiedadeCurso,
-    mediaEstresseCurso,
+      },
+      { depressao: 0, ansiedade: 0, estresse: 0 }
+    );
+
+    const mediaDepressaoCurso = mediaPontuacoes.depressao;
+    const mediaAnsiedadeCurso = mediaPontuacoes.ansiedade;
+    const mediaEstresseCurso = mediaPontuacoes.estresse;
+
+    // Salvar os resultados para cada curso, incluindo o nome do curso
+    cursosComMedias.push({
+      curso: cursos[i].curso, // Substitua 'nome' pela propriedade correta do curso
+      mediaDepressaoCurso,
+      mediaAnsiedadeCurso,
+      mediaEstresseCurso,
+    });
+
+    console.log(
+      `Média de Depressão para ${cursos[i].nome}:`,
+      mediaDepressaoCurso
+    );
+    console.log(
+      `Média de Ansiedade para ${cursos[i].nome}:`,
+      mediaAnsiedadeCurso
+    );
+    console.log(
+      `Média de Estresse para ${cursos[i].nome}:`,
+      mediaEstresseCurso
+    );
+
+    i++;
+  } while (i < cursos.length);
+
+  console.table(cursosComMedias);
+
+  console.log("soma de depressao total: ", somaD);
+  console.log("soma de ansiedade total: ", somaA);
+  console.log("soma de estresse total: ", somaE);
+
+  console.log("Media Depressao: ", mediaD);
+  console.log("Media Ansiedade: ", mediaA);
+  console.log("Media Estresse: ", mediaE);
+  console.log("Soma Depressão Normal: ", somaDepressaoNormal);
+  console.log("Soma Depressão Lev-Mod: ", somaDepressaoLeveModerado);
+  console.log("Soma Depressão Seve-ExtSeve: ", somaDepressaoSeveroExSevero);
+  console.log("Soma Ansiedade Normal: ", somaAnsiedadeNormal);
+  console.log("Soma Ansiedade Lev-Mod: ", somaAnsiedadeLeveModerado);
+  console.log("Soma Ansiedade Seve-ExtSeve: ", somaAnsiedadeSeveroExSevero);
+  console.log("Soma Estresse Normal: ", somaEstresseNormal);
+  console.log("Soma Estresse Lev-Mod: ", somaEstresseLeveModerado);
+  console.log("Soma Estresse Seve-ExtSeve", somaEstresseSeveroExSevero);
+  console.log("% Depressao Normal: ", porcentagemDNormal);
+  console.log("% Depressao Leve-Mod: ", porcentagemDLeveMod);
+  console.log("% Depressao Seve-ExtSeve: ", porcentagemDSevExSev);
+  console.log("% Ansiedade Normal: ", porcentagemANormal);
+  console.log("% Ansiedade Leve-Mod: : ", porcentagemALeveMod);
+  console.log("% Ansiedade Seve-ExtSeve: ", porcentagemASevExSev);
+  console.log("% Estresse Normal: ", porcentagemENormal);
+  console.log("% Estresse Leve-Mod: ", porcentagemELeveMod);
+  console.log("% Estresse Seve-ExtSeve: ", porcentagemESevExSev);
+
+  res.render("admin/principal.ejs", {
+    usuario,
+    mediaIMC,
+    classGeralIMC,
+    mediaD,
+    mediaA,
+    mediaE,
+    somaDepressaoNormal,
+    somaDepressaoLeveModerado,
+    somaDepressaoSeveroExSevero,
+    somaAnsiedadeNormal,
+    somaAnsiedadeLeveModerado,
+    somaAnsiedadeSeveroExSevero,
+    somaEstresseNormal,
+    somaEstresseLeveModerado,
+    somaEstresseSeveroExSevero,
+    todasAvaliacoesdae,
+    classSomaA,
+    classSomaD,
+    classSomaE,
+    porcentagemDNormal,
+    porcentagemDLeveMod,
+    porcentagemDSevExSev,
+    porcentagemANormal,
+    porcentagemALeveMod,
+    porcentagemASevExSev,
+    porcentagemENormal,
+    porcentagemELeveMod,
+    porcentagemESevExSev,
+    cursosComMedias,
   });
-
-  console.log(`Média de Depressão para ${cursos[i].nome}:`, mediaDepressaoCurso);
-  console.log(`Média de Ansiedade para ${cursos[i].nome}:`, mediaAnsiedadeCurso);
-  console.log(`Média de Estresse para ${cursos[i].nome}:`, mediaEstresseCurso);
-
-      
-        i++;
-      } while (i < cursos.length);
-
-     
-      console.table(cursosComMedias);
-      
-     
-
-      
-      console.log('soma de depressao total: ', somaD);
-      console.log('soma de ansiedade total: ', somaA);
-      console.log('soma de estresse total: ', somaE);
-
-      
-      
-
-      console.log("Media Depressao: ", mediaD);
-      console.log("Media Ansiedade: ", mediaA);
-      console.log("Media Estresse: ", mediaE);
-      console.log("Soma Depressão Normal: ", somaDepressaoNormal);
-      console.log("Soma Depressão Lev-Mod: ", somaDepressaoLeveModerado);
-      console.log("Soma Depressão Seve-ExtSeve: ", somaDepressaoSeveroExSevero);
-      console.log("Soma Ansiedade Normal: ", somaAnsiedadeNormal);
-      console.log("Soma Ansiedade Lev-Mod: ", somaAnsiedadeLeveModerado);
-      console.log("Soma Ansiedade Seve-ExtSeve: ", somaAnsiedadeSeveroExSevero);
-      console.log("Soma Estresse Normal: ", somaEstresseNormal);
-      console.log("Soma Estresse Lev-Mod: ", somaEstresseLeveModerado);
-      console.log("Soma Estresse Seve-ExtSeve", somaEstresseSeveroExSevero);
-      console.log("% Depressao Normal: ", porcentagemDNormal);
-      console.log("% Depressao Leve-Mod: " , porcentagemDLeveMod);
-      console.log("% Depressao Seve-ExtSeve: ", porcentagemDSevExSev);
-      console.log("% Ansiedade Normal: ", porcentagemANormal);
-      console.log("% Ansiedade Leve-Mod: : ", porcentagemALeveMod);
-      console.log("% Ansiedade Seve-ExtSeve: ", porcentagemASevExSev);
-      console.log("% Estresse Normal: ", porcentagemENormal);
-      console.log("% Estresse Leve-Mod: ", porcentagemELeveMod);
-      console.log("% Estresse Seve-ExtSeve: ", porcentagemESevExSev);
-
-
-  res.render("admin/principal.ejs", { 
-  usuario, mediaIMC, classGeralIMC, mediaD, mediaA, mediaE,
-  somaDepressaoNormal,somaDepressaoLeveModerado, somaDepressaoSeveroExSevero, somaAnsiedadeNormal,
-  somaAnsiedadeLeveModerado, somaAnsiedadeSeveroExSevero, somaEstresseNormal, somaEstresseLeveModerado, 
-  somaEstresseSeveroExSevero, todasAvaliacoesdae, classSomaA, classSomaD, classSomaE,
-  porcentagemDNormal, porcentagemDLeveMod, porcentagemDSevExSev, porcentagemANormal, porcentagemALeveMod,
-  porcentagemASevExSev, porcentagemENormal, porcentagemELeveMod, porcentagemESevExSev,
-  cursosComMedias,
-});
 }
 
 async function alunos(req, res) {
@@ -676,8 +819,6 @@ async function addturmas(req, res) {
     msg: " ",
   });
 }
-
-
 
 async function profile(req, res) {
   const usuario = await importausuario(req);
@@ -1074,9 +1215,7 @@ async function parseCSVAndSaveToDatabaseResp(csvStream) {
 
             console.log(`Avaliação para  adicionada com sucesso.`);
           } else {
-            console.log(
-              `Usuário  não encontrado. Avaliação não adicionada.`
-            );
+            console.log(`Usuário  não encontrado. Avaliação não adicionada.`);
           }
         }
 
@@ -1190,7 +1329,12 @@ async function verperfilaluno(req, res) {
     });
 
     console.log(aluno);
-    res.render("admin/profilealunos.ejs", { usuario, aluno, avaliacoes, avaliacoesdae });
+    res.render("admin/profilealunos.ejs", {
+      usuario,
+      aluno,
+      avaliacoes,
+      avaliacoesdae,
+    });
   } catch (error) {
     console.error("Erro ao buscar aluno:", error);
     res.status(500).send("Erro interno do servidor");
@@ -1234,7 +1378,7 @@ async function veralunosturma(req, res) {
         },
       ],
     });
-    
+
     res.render("admin/veralunosturma.ejs", { usuario, alunosdaturma });
   } catch (error) {
     console.error("Erro ao buscar alunos:", error);
@@ -1310,7 +1454,7 @@ async function salvaravcorp(req, res) {
   }
 }
 
-async function veravcorp(req,res){
+async function veravcorp(req, res) {
   let usuario;
 
   try {
@@ -1323,12 +1467,12 @@ async function veravcorp(req,res){
       },
       include: [
         {
-          model: Usuario, 
-          attributes: ['nome'],
+          model: Usuario,
+          attributes: ["nome"],
         },
       ],
     });
-    
+
     res.render("admin/veravcorp.ejs", { usuario, avaliacao });
   } catch (error) {
     console.error("Erro ao buscar avaliação:", error);
@@ -1336,7 +1480,7 @@ async function veravcorp(req,res){
   }
 }
 
-async function veravdae(req,res){
+async function veravdae(req, res) {
   let usuario;
 
   try {
@@ -1349,12 +1493,12 @@ async function veravdae(req,res){
       },
       include: [
         {
-          model: Usuario, 
-          attributes: ['nome'],
+          model: Usuario,
+          attributes: ["nome"],
         },
       ],
     });
-    
+
     res.render("admin/veravdae.ejs", { usuario, avaliacao });
   } catch (error) {
     console.error("Erro ao buscar avaliação:", error);
@@ -1362,7 +1506,7 @@ async function veravdae(req,res){
   }
 }
 
-async function deletavaliacaodaealuno(req,res){
+async function deletavaliacaodaealuno(req, res) {
   const itemId = req.params.id;
   console.log(itemId);
 
@@ -1371,11 +1515,13 @@ async function deletavaliacaodaealuno(req,res){
 
     return res.redirect("/alunos");
   } catch (error) {
-    return res.status(500).json({ message: "Erro ao remover Avaliação DAE", error });
+    return res
+      .status(500)
+      .json({ message: "Erro ao remover Avaliação DAE", error });
   }
 }
 
-async function deletavaliacaocorpaluno(req,res){
+async function deletavaliacaocorpaluno(req, res) {
   const itemId = req.params.id;
   console.log(itemId);
 
@@ -1384,9 +1530,110 @@ async function deletavaliacaocorpaluno(req,res){
 
     return res.redirect("/alunos");
   } catch (error) {
-    return res.status(500).json({ message: "Erro ao remover Avaliação corporal", error });
+    return res
+      .status(500)
+      .json({ message: "Erro ao remover Avaliação corporal", error });
   }
 }
+
+async function relatorio(req, res) {
+  usuario = await importausuario(req);
+  res.render('admin/relatorio.ejs', { usuario: usuario });
+}
+
+async function emiterelatorio(req, res) {
+  try {
+    const diretorioTemp = path.join(__dirname, '..', 'temp');
+    if (!fs.existsSync(diretorioTemp)) {
+      fs.mkdirSync(diretorioTemp);
+    }
+    // Busca todas as avaliações da tabela Avaliacao
+    const avaliacoes = await Avaliacao.findAll({
+      include: [{ model: Usuario, attributes: ['nome'] }]
+    });
+
+    // Busca todas as avaliações da tabela AvaliacaoDae
+    const avaliacoesDae = await AvaliacaoDae.findAll({
+      include: [{ model: Usuario, attributes: ['nome'] }]
+    });
+
+    // Define o nome do arquivo
+    const nomeArquivo = 'relatorio.csv';
+
+    const caminhoArquivo = path.join(diretorioTemp, nomeArquivo);
+
+
+    // Cria um escritor CSV para escrever os dados no arquivo
+    const writer = createCsvWriter({
+      path: caminhoArquivo,
+      header: [
+        { id: 'id', title: 'ID' },
+        { id: 'nome', title: 'Nome' },
+        { id: 'data_avaliacao', title: 'Data da avaliação' },
+        { id: 'avaliador', title: 'Avaliador' },
+        { id: 'estatura', title: 'Estatura' },
+        { id: 'peso', title: 'Peso' },
+        { id: 'IMC', title: 'IMC' },
+        { id: 'FCrep', title: 'FCrep' },
+        { id: 'PASrep', title: 'PASrep' },
+        { id: 'PADrep', title: 'PADrep' },
+        { id: 'GCr', title: 'GCr' },
+        { id: 'MMr', title: 'MMr' },
+        { id: 'MMUr', title: 'MMUr' },
+        { id: 'H2O', title: 'H2O' },
+        { id: 'GordVise', title: 'GordVise' },
+        { id: 'proteina', title: 'Proteina' },
+        { id: 'TaxObes', title: 'TxObes' }
+      ]
+    });
+
+    // Escreve os dados da tabela Avaliacao no arquivo
+    await writer.writeRecords(avaliacoes.map(avaliacao => ({
+      id: avaliacao.id,
+      nome: avaliacao.Usuario.nome,
+      data_avaliacao: avaliacao.data_avaliacao,
+      avaliador: avaliacao.avaliador,
+      estatura: avaliacao.estatura,
+      peso: avaliacao.peso,
+      IMC: avaliacao.IMC,
+      FCrep: avaliacao.FCrep,
+      PASrep: avaliacao.PASrep,
+      PADrep: avaliacao.PADrep,
+      GCr: avaliacao.GCr,
+      MMr: avaliacao.MMr,
+      MMUr: avaliacao.MMUr,
+      H2O: avaliacao.H2O,
+      GordVise: avaliacao.GordVise,
+      proteina: avaliacao.proteina,
+      TaxObes: avaliacao.TaxObes
+    })));
+
+    // Escreve os dados da tabela AvaliacaoDae no arquivo
+    await writer.writeRecords(avaliacoesDae.map(avaliacaoDae => ({
+      id: avaliacaoDae.id,
+      nome: avaliacaoDae.Usuario.nome,
+      data_avaliacao: avaliacaoDae.data_avaliacao,
+      depressao: avaliacaoDae.depressao,
+      ansiedade: avaliacaoDae.ansiedade,
+      estresse: avaliacaoDae.estresse
+    })));
+
+    // Inicia o download do arquivo CSV
+    res.download(caminhoArquivo, nomeArquivo, (err) => {
+      if (err) {
+        console.error('Erro ao fazer download do arquivo:', err);
+      } else {
+        // Exclui o arquivo após o download bem-sucedido
+        fs.unlinkSync(caminhoArquivo);
+      }
+    });
+
+  } catch (error) {
+    console.error('Erro ao gerar o relatório:', error);
+    res.status(500).send('Erro ao gerar o relatório');
+  }
+}
+
 module.exports = {
   home,
   alunos,
@@ -1421,4 +1668,6 @@ module.exports = {
   deletavaliacaodaealuno,
   deletavaliacaocorpaluno,
   amostra,
+  emiterelatorio,
+  relatorio,
 };
