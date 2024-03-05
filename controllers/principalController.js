@@ -1,6 +1,6 @@
 const bcrypt = require("bcrypt");
 const { Op, Sequelize } = require("sequelize");
-const createCsvWriter = require('csv-writer').createObjectCsvWriter;
+const createCsvWriter = require("csv-writer").createObjectCsvWriter;
 const moment = require("moment");
 const Usuario = require("../models/Usuario");
 const Curso = require("../models/Curso");
@@ -12,6 +12,7 @@ const fs = require("fs");
 const path = require("path");
 const csv = require("csv-parser");
 const PDFDocument = require("pdfkit");
+const { Parser } = require("json2csv");
 
 async function amostra(req, res) {
   const hasAvaliacaoData = await Avaliacao.findOne({});
@@ -1538,101 +1539,48 @@ async function deletavaliacaocorpaluno(req, res) {
 
 async function relatorio(req, res) {
   usuario = await importausuario(req);
-  res.render('admin/relatorio.ejs', { usuario: usuario });
+  res.render("admin/relatorio.ejs", { usuario: usuario });
 }
 
 async function emiterelatorio(req, res) {
   try {
-    const diretorioTemp = path.join(__dirname, '..', 'temp');
-    if (!fs.existsSync(diretorioTemp)) {
-      fs.mkdirSync(diretorioTemp);
-    }
-    // Busca todas as avaliações da tabela Avaliacao
-    const avaliacoes = await Avaliacao.findAll({
-      include: [{ model: Usuario, attributes: ['nome'] }]
+    const buscaAvaliacaoDae = await AvaliacaoDae.findAll({
+      include: [
+        {
+          model: Usuario,
+          attributes: ["nome"],
+        },
+      ],
     });
 
-    // Busca todas as avaliações da tabela AvaliacaoDae
-    const avaliacoesDae = await AvaliacaoDae.findAll({
-      include: [{ model: Usuario, attributes: ['nome'] }]
+    const nomeArquivoDae = "relatorio_avaliacaodae.csv";
+    const caminhoArquivoDae = path.join(__dirname, "..", "temp", nomeArquivoDae);
+
+    const streamDae = fs.createWriteStream(caminhoArquivoDae);
+
+    streamDae.write("ID da avaliacao, Nome, Data da avaliação, Depressao, Ansiedade, Estresse\n");
+    buscaAvaliacaoDae.forEach((avaliacaoDae) => {
+      streamDae.write(`${avaliacaoDae.id}, ${avaliacaoDae.Usuario.nome}, ${avaliacaoDae.data_avaliacao}, ${avaliacaoDae.depressao}, ${avaliacaoDae.ansiedade}, ${avaliacaoDae.estresse}\n`);
     });
 
-    // Define o nome do arquivo
-    const nomeArquivo = 'relatorio.csv';
-
-    const caminhoArquivo = path.join(diretorioTemp, nomeArquivo);
-
-
-    // Cria um escritor CSV para escrever os dados no arquivo
-    const writer = createCsvWriter({
-      path: caminhoArquivo,
-      header: [
-        { id: 'id', title: 'ID' },
-        { id: 'nome', title: 'Nome' },
-        { id: 'data_avaliacao', title: 'Data da avaliação' },
-        { id: 'avaliador', title: 'Avaliador' },
-        { id: 'estatura', title: 'Estatura' },
-        { id: 'peso', title: 'Peso' },
-        { id: 'IMC', title: 'IMC' },
-        { id: 'FCrep', title: 'FCrep' },
-        { id: 'PASrep', title: 'PASrep' },
-        { id: 'PADrep', title: 'PADrep' },
-        { id: 'GCr', title: 'GCr' },
-        { id: 'MMr', title: 'MMr' },
-        { id: 'MMUr', title: 'MMUr' },
-        { id: 'H2O', title: 'H2O' },
-        { id: 'GordVise', title: 'GordVise' },
-        { id: 'proteina', title: 'Proteina' },
-        { id: 'TaxObes', title: 'TxObes' }
-      ]
+    streamDae.on("finish", () => {
+      res.setHeader("Content-Type", "text/csv");
+      res.setHeader("Content-Disposition", `attachment; filename="${nomeArquivoDae}"`);
+      res.sendFile(caminhoArquivoDae, () => {
+        fs.unlinkSync(caminhoArquivoDae);
+      });
     });
 
-    // Escreve os dados da tabela Avaliacao no arquivo
-    await writer.writeRecords(avaliacoes.map(avaliacao => ({
-      id: avaliacao.id,
-      nome: avaliacao.Usuario.nome,
-      data_avaliacao: avaliacao.data_avaliacao,
-      avaliador: avaliacao.avaliador,
-      estatura: avaliacao.estatura,
-      peso: avaliacao.peso,
-      IMC: avaliacao.IMC,
-      FCrep: avaliacao.FCrep,
-      PASrep: avaliacao.PASrep,
-      PADrep: avaliacao.PADrep,
-      GCr: avaliacao.GCr,
-      MMr: avaliacao.MMr,
-      MMUr: avaliacao.MMUr,
-      H2O: avaliacao.H2O,
-      GordVise: avaliacao.GordVise,
-      proteina: avaliacao.proteina,
-      TaxObes: avaliacao.TaxObes
-    })));
-
-    // Escreve os dados da tabela AvaliacaoDae no arquivo
-    await writer.writeRecords(avaliacoesDae.map(avaliacaoDae => ({
-      id: avaliacaoDae.id,
-      nome: avaliacaoDae.Usuario.nome,
-      data_avaliacao: avaliacaoDae.data_avaliacao,
-      depressao: avaliacaoDae.depressao,
-      ansiedade: avaliacaoDae.ansiedade,
-      estresse: avaliacaoDae.estresse
-    })));
-
-    // Inicia o download do arquivo CSV
-    res.download(caminhoArquivo, nomeArquivo, (err) => {
-      if (err) {
-        console.error('Erro ao fazer download do arquivo:', err);
-      } else {
-        // Exclui o arquivo após o download bem-sucedido
-        fs.unlinkSync(caminhoArquivo);
-      }
-    });
-
+    streamDae.end();
   } catch (error) {
-    console.error('Erro ao gerar o relatório:', error);
-    res.status(500).send('Erro ao gerar o relatório');
+    console.error("Erro ao gerar o relatório", error);
+    res.status(500).send("Erro ao gerar o relatório");
   }
 }
+
+
+
+
 
 module.exports = {
   home,
