@@ -1553,31 +1553,52 @@ async function emiterelatorio(req, res) {
       ],
     });
 
-    const nomeArquivoDae = "relatorio_avaliacaodae.csv";
-    const caminhoArquivoDae = path.join(__dirname, "..", "temp", nomeArquivoDae);
-
-    const streamDae = fs.createWriteStream(caminhoArquivoDae);
-
-    streamDae.write("ID da avaliacao, Nome, Data da avaliação, Depressao, Ansiedade, Estresse\n");
-    buscaAvaliacaoDae.forEach((avaliacaoDae) => {
-      streamDae.write(`${avaliacaoDae.id}, ${avaliacaoDae.Usuario.nome}, ${avaliacaoDae.data_avaliacao}, ${avaliacaoDae.depressao}, ${avaliacaoDae.ansiedade}, ${avaliacaoDae.estresse}\n`);
+    const buscaAvaliacao = await Avaliacao.findAll({
+      include: [
+        {
+          model: Usuario,
+          attributes: ["nome"],
+        },
+      ],
     });
 
-    streamDae.on("finish", () => {
+    const nomeArquivo = "relatorio.csv";
+    const caminhoArquivo = path.join(__dirname, "..", "temp", nomeArquivo);
+    const stream = fs.createWriteStream(caminhoArquivo);
+
+    // Escreve cabeçalho para AvaliacaoDae
+    stream.write("Tipo da avaliação, ID da avaliacao, Nome, Data da avaliação, Depressao, Ansiedade, Estresse\n");
+    
+    // Escreve dados de AvaliacaoDae
+    buscaAvaliacaoDae.forEach((avaliacaoDae) => {
+      stream.write(`Avaliação Dae, ${avaliacaoDae.id}, ${avaliacaoDae.Usuario.nome}, ${avaliacaoDae.data_avaliacao}, ${avaliacaoDae.depressao}, ${avaliacaoDae.ansiedade}, ${avaliacaoDae.estresse}\n`);
+    });
+
+    // Quebra de linha entre os conjuntos de dados
+    stream.write("\n");
+
+    // Escreve cabeçalho para Avaliacao
+    stream.write("Tipo da avaliação, ID da avaliacao, Nome, Avaliador, Data da avaliação, Estatura, Peso, IMC, FCrep, PASrep, PADrep, GCr, MMr, MMUr, H2O, GordVise, Proteina, TxObes\n");
+
+    // Escreve dados de Avaliacao
+    buscaAvaliacao.forEach((avaliacao) => {
+      stream.write(`Avaliação Corporal, ${avaliacao.id}, ${avaliacao.Usuario.nome}, ${avaliacao.avaliador}, ${avaliacao.data_avaliacao}, ${avaliacao.estatura}, ${avaliacao.peso}, ${avaliacao.IMC}, ${avaliacao.FCrep}, ${avaliacao.PASrep}, ${avaliacao.PADrep}, ${avaliacao.GCr}, ${avaliacao.MMr}, ${avaliacao.MMUr}, ${avaliacao.H2O}, ${avaliacao.GordVise}, ${avaliacao.Proteina}, ${avaliacao.TxObes}\n`);
+    });
+
+    stream.on("finish", () => {
       res.setHeader("Content-Type", "text/csv");
-      res.setHeader("Content-Disposition", `attachment; filename="${nomeArquivoDae}"`);
-      res.sendFile(caminhoArquivoDae, () => {
-        fs.unlinkSync(caminhoArquivoDae);
+      res.setHeader("Content-Disposition", `attachment; filename="${nomeArquivo}"`);
+      res.sendFile(caminhoArquivo, () => {
+        fs.unlinkSync(caminhoArquivo);
       });
     });
 
-    streamDae.end();
+    stream.end();
   } catch (error) {
     console.error("Erro ao gerar o relatório", error);
     res.status(500).send("Erro ao gerar o relatório");
   }
 }
-
 
 
 
