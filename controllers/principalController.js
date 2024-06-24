@@ -240,7 +240,7 @@ async function amostra(req, res) {
         ],
       },
     ],
-  }); // Supondo que você tenha um método findAll para buscar todos os cursos
+  }); 
 
   const cursosComMedias = [];
 
@@ -278,9 +278,9 @@ async function amostra(req, res) {
     const mediaAnsiedadeCurso = mediaPontuacoes.ansiedade;
     const mediaEstresseCurso = mediaPontuacoes.estresse;
 
-    // Salvar os resultados para cada curso, incluindo o nome do curso
+    
     cursosComMedias.push({
-      curso: cursos[i].curso, // Substitua 'nome' pela propriedade correta do curso
+      curso: cursos[i].curso, 
       mediaDepressaoCurso,
       mediaAnsiedadeCurso,
       mediaEstresseCurso,

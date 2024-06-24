@@ -10,6 +10,9 @@ const Usuario = conexao.define(
     nome: {
       type: DataTypes.STRING,
     },
+    sobrenome: {
+      type: DataTypes.STRING,
+    },
     data_nascimento: {
       type: DataTypes.DATEONLY,
     },

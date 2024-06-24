@@ -11,6 +11,7 @@ module.exports = {
       },
       foto: Sequelize.STRING,
       nome: Sequelize.STRING,
+      sobrenome: Sequelize.STRING,
       data_nascimento: Sequelize.DATEONLY,
       cpf: { type: Sequelize.STRING, unique:true },
       etnia: Sequelize.STRING,
