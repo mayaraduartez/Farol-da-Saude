@@ -10,7 +10,7 @@ module.exports = {
         allowNull: false,
       },
       foto: Sequelize.STRING,
-      nome: Sequelize.STRING,
+      nome: {type: Sequelize.STRING, allowNull: false},
       sobrenome: Sequelize.STRING,
       data_nascimento: Sequelize.DATEONLY,
       cpf: { type: Sequelize.STRING, unique:true },

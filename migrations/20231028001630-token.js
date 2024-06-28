@@ -21,9 +21,7 @@ module.exports = {
     token: {
       type: Sequelize.STRING,
     },
-    datacriacao: {
-      type: Sequelize.DATEONLY,
-    },
+    datacriacao: {type: Sequelize.DATEONLY, allowNull: false},
    });
   },
 

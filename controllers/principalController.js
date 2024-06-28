@@ -279,12 +279,14 @@ async function amostra(req, res) {
     const mediaEstresseCurso = mediaPontuacoes.estresse;
 
     
-    cursosComMedias.push({
-      curso: cursos[i].curso, 
-      mediaDepressaoCurso,
-      mediaAnsiedadeCurso,
-      mediaEstresseCurso,
-    });
+    if (cursos[i].curso) { 
+      cursosComMedias.push({
+        curso: cursos[i].curso,
+        mediaDepressaoCurso,
+        mediaAnsiedadeCurso,
+        mediaEstresseCurso,
+      });
+    }
 
     console.log(
       `Média de Depressão para ${cursos[i].nome}:`,
@@ -625,40 +627,42 @@ async function home(req, res) {
 
   const cursosComMedias = [];
 
-  let i = 0;
-  do {
-    const cursoId = cursos[i].id;
+let i = 0;
+do {
+  const cursoId = cursos[i].id;
 
-    const usuariosDoCurso = await Usuario.findAll({
-      include: [
-        {
-          model: Turmas,
-          where: { CursoId: cursoId },
-        },
-      ],
-    });
-
-    // Encontrar todas as avaliações dos usuários do curso
-    const avaliacoesDoCurso = await AvaliacaoDae.findAll({
-      where: {
-        UsuarioId: usuariosDoCurso.map((usuario) => usuario.id),
+  const usuariosDoCurso = await Usuario.findAll({
+    include: [
+      {
+        model: Turmas,
+        where: { CursoId: cursoId },
       },
-    });
+    ],
+  });
 
-    const mediaPontuacoes = avaliacoesDoCurso.reduce(
-      (media, avaliacao) => {
-        media.depressao += avaliacao.depressaoScore / avaliacoesDoCurso.length;
-        media.ansiedade += avaliacao.ansiedadeScore / avaliacoesDoCurso.length;
-        media.estresse += avaliacao.estresseScore / avaliacoesDoCurso.length;
-        return media;
-      },
-      { depressao: 0, ansiedade: 0, estresse: 0 }
-    );
+  // Encontrar todas as avaliações dos usuários do curso
+  const avaliacoesDoCurso = await AvaliacaoDae.findAll({
+    where: {
+      UsuarioId: usuariosDoCurso.map((usuario) => usuario.id),
+    },
+  });
 
-    const mediaDepressaoCurso = mediaPontuacoes.depressao;
-    const mediaAnsiedadeCurso = mediaPontuacoes.ansiedade;
-    const mediaEstresseCurso = mediaPontuacoes.estresse;
+  const mediaPontuacoes = avaliacoesDoCurso.reduce(
+    (media, avaliacao) => {
+      media.depressao += avaliacao.depressaoScore / avaliacoesDoCurso.length;
+      media.ansiedade += avaliacao.ansiedadeScore / avaliacoesDoCurso.length;
+      media.estresse += avaliacao.estresseScore / avaliacoesDoCurso.length;
+      return media;
+    },
+    { depressao: 0, ansiedade: 0, estresse: 0 }
+  );
 
+  const mediaDepressaoCurso = mediaPontuacoes.depressao;
+  const mediaAnsiedadeCurso = mediaPontuacoes.ansiedade;
+  const mediaEstresseCurso = mediaPontuacoes.estresse;
+
+  // Verificar se o curso não é nulo ou vazio antes de adicionar ao array
+  if (cursos[i].curso && cursos[i].curso.trim() !== "") {
     // Salvar os resultados para cada curso, incluindo o nome do curso
     cursosComMedias.push({
       curso: cursos[i].curso, // Substitua 'nome' pela propriedade correta do curso
@@ -666,22 +670,12 @@ async function home(req, res) {
       mediaAnsiedadeCurso,
       mediaEstresseCurso,
     });
+  }
 
-    console.log(
-      `Média de Depressão para ${cursos[i].nome}:`,
-      mediaDepressaoCurso
-    );
-    console.log(
-      `Média de Ansiedade para ${cursos[i].nome}:`,
-      mediaAnsiedadeCurso
-    );
-    console.log(
-      `Média de Estresse para ${cursos[i].nome}:`,
-      mediaEstresseCurso
-    );
+  i++;
+} while (i < cursos.length);
 
-    i++;
-  } while (i < cursos.length);
+
 
   console.table(cursosComMedias);
 
@@ -982,14 +976,15 @@ async function parseCSVAndSaveToDatabase(csvStream) {
         const usuarios = [];
 
         for (const data of results) {
+          // Verificar se o curso não é nulo ou vazio
+          if (!data.curso || data.curso.trim() === "") {
+            console.log(`Curso inválido para o usuário ${data.nome}. Ignorando entrada.`);
+            continue; // Pular para a próxima iteração do loop
+          }
+
           // Tratamento da data de nascimento
-          const dataNascimento = moment(
-            data.data_nascimento,
-            "DD/MM/YYYY"
-          ).startOf("day");
-          const dataNascimentoFormatada = dataNascimento
-            .tz("America/Sao_Paulo")
-            .format("YYYY-MM-DD");
+          const dataNascimento = moment(data.data_nascimento, "DD/MM/YYYY").startOf("day");
+          const dataNascimentoFormatada = dataNascimento.tz("America/Sao_Paulo").format("YYYY-MM-DD");
           const senha = generatePassword();
           const hashedSenha = bcrypt.hashSync(senha, 10);
 
@@ -1070,6 +1065,7 @@ async function parseCSVAndSaveToDatabase(csvStream) {
       });
   });
 }
+
 
 async function uploadarqresp(req, res) {
   try {

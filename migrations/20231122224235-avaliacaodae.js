@@ -18,7 +18,7 @@ module.exports = {
           onUpdate: "CASCADE",
           onDelete: "CASCADE",
       },
-      data_avaliacao: Sequelize.DATEONLY,
+      data_avaliacao: {type: Sequelize.DATEONLY, allowNull: false},
       perg1: Sequelize.INTEGER,
       perg2: Sequelize.INTEGER,
       perg3: Sequelize.INTEGER,
